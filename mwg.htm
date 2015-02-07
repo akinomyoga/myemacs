@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <title>mwg.el</title>
+  <link rel="stylesheet" type="text/css" href="http://padparadscha/agh/mwg.std.css" />
+  <link rel="stylesheet" type="text/css" href="http://padparadscha/agh/prog.std.css" />
+  <meta name="agh-fly-type" content="color" />
+  <script type="text/javascript" charset="utf-8" src="http://padparadscha/agh/agh.fly.js"></script>
+</head>
+<body class="width72">
+<h1>mwg.el</h1>
+
+<h2>移動コマンド</h2>
+<table class="normal center">
+<tr><th>移動単位</th><th>後方</th><th>前方</th><th>後方選択</th><th>前方選択</th></tr>
+<tr>
+  <td>文字</td>
+  <td><kbd>C-b</kbd><br /><kbd>left</kbd></td>
+  <td><kbd>C-f</kbd><br /><kbd>right</kbd></td>
+  <td><kbd>C-S-b</kbd><br /><kbd>S-left</kbd></td>
+  <td><kbd>C-S-f</kbd><br /><kbd>S-right</kbd></td>
+</tr>
+<tr>
+  <td>単語</td>
+  <td><kbd>M-b</kbd><br /><kbd>M-left</kbd></td>
+  <td><kbd><strong>M-f M-f</strong></kbd><br /><kbd>M-right</kbd></td>
+  <td><kbd>M-S-b</kbd><br /><kbd>M-S-left</kbd></td>
+  <td><kbd>M-S-f</kbd><br /><kbd>M-S-right</kbd></td>
+</tr>
+<tr>
+  <td>C単語</td>
+  <td><kbd>C-M-b</kbd><br /><kbd>C-left</kbd></td>
+  <td><kbd>C-M-f</kbd><br /><kbd>C-right</kbd></td>
+  <td><kbd>C-M-S-b</kbd><br /><kbd>C-S-left</kbd></td>
+  <td><kbd>C-M-S-f</kbd><br /><kbd>C-S-right</kbd></td>
+</tr>
+<tr>
+  <td>行頭</td>
+  <td><kbd>C-a</kbd><br /><kbd>home</kbd></td>
+  <td><kbd>C-e</kbd><br /><kbd>end</kbd></td>
+  <td><kbd>C-S-a</kbd><br /><kbd>S-home</kbd></td>
+  <td><kbd>C-S-e</kbd><br /><kbd>S-end</kbd></td>
+</tr>
+<tr>
+  <td>行</td>
+  <td><kbd>C-p</kbd><br /><kbd>up</kbd></td>
+  <td><kbd>C-n</kbd><br /><kbd>down</kbd></td>
+  <td><kbd>C-S-p</kbd><br /><kbd>S-up</kbd></td>
+  <td><kbd>C-S-n</kbd><br /><kbd>S-down</kbd></td>
+</tr>
+<tr>
+  <td>3行</td>
+  <td><kbd>M-p</kbd><br /><kbd>M-up</kbd></td>
+  <td><kbd>M-n</kbd><br /><kbd>M-down</kbd></td>
+  <td><kbd>M-S-p</kbd><br /><kbd>M-S-right</kbd></td>
+  <td><kbd>M-S-n</kbd><br /><kbd>M-S-down</kbd></td>
+</tr>
+<tr>
+  <td>頁</td>
+  <td><kbd>M-v</kbd><br /><kbd>prev</kbd></td>
+  <td><kbd>C-v</kbd><br /><kbd>next</kbd></td>
+  <td><kbd>M-S-v</kbd><br /><kbd>S-prev</kbd></td>
+  <td><kbd>C-S-v</kbd><br /><kbd>S-next</kbd></td>
+</tr>
+<tr>
+  <td>ファイル先頭</td>
+  <td><kbd><strong>M-,</strong></kbd><br /><kbd>C-home</kbd></td>
+  <td><kbd><strong>M-.</strong></kbd><br /><kbd>C-end</kbd></td>
+  <td><kbd><strong>M-&lt;</strong></kbd><br /><kbd>C-S-home</kbd></td>
+  <td><kbd><strong>M-&gt;</strong></kbd><br /><kbd>C-S-end</kbd></td>
+</tr>
+<tr>
+  <td>スクロール</td>
+  <td><kbd>C-,</kbd><br /><kbd>C-down</kbd></td>
+  <td><kbd>C-.</kbd><br /><kbd>C-up</kbd></td>
+  <td><kbd>-</kbd><br /><kbd>-</kbd></td>
+  <td><kbd>-</kbd><br /><kbd>-</kbd></td>
+</tr>
+<tr>
+  <td></td>
+  <td><kbd></kbd><br /><kbd></kbd></td>
+  <td><kbd></kbd><br /><kbd></kbd></td>
+  <td><kbd></kbd><br /><kbd></kbd></td>
+  <td><kbd></kbd><br /><kbd></kbd></td>
+</tr>
+</table>
+
+<h3>emacs デフォルト</h3>
+<table class="normal center">
+<tr><th></th>
+  <th>key</th>
+  <th>C-key</th>
+  <th>M-key</th>
+  <th>C-M-key</th>
+</tr>
+<tr><td>b<br />f</td>
+  <td>self-insert</td>
+  <td>backward-char<br />forward-char</td>
+  <td>backward-word<br />forward-word</td>
+  <td rowspan="2">backward-sexp<br />forward-sexp</td>
+</tr>
+<tr><td>left<br />right</td>
+  <td>left-char<br />right-char</td>
+  <td colspan="2">left-word<br />right-word</td>
+</tr>
+<tr><td>p<br />n</td>
+  <td>self-insert</td>
+  <td>previous-line<br />next-line</td>
+  <td rowspan="2">-</td>
+  <td rowspan="2">backward-up-list<br />forward-list</td>
+</tr>
+<tr><td>up<br />down</td>
+  <td>previous-line<br />next-line</td>
+  <td>backward-paragraph<br />forward-paragraph</td>
+</tr>
+<tr><td>a<br />e</td>
+  <td>self-insert</td>
+  <td>beginning-of-line<br />end-of-line</td>
+  <td>backward-sentence<br />forward-sentence</td>
+  <td rowspan="2">beginning-of-defun<br />end-of-defun</td>
+</tr>
+<tr><td>home<br />end</td>
+  <td>beginning-of-line<br />end-of-line</td>
+  <td>beginning-of-buffer<br />end-of-buffer</td>
+  <td>beginning-of-buffer-other-window<br />end-of-buffer-other-window</td>
+</tr>
+<tr><td>prior<br />next</td>
+  <td>scroll-down-command<br />scroll-up-command</td>
+  <td>scroll-right<br />scroll-left</td>
+  <td>scroll-other-window-down<br />scroll-other-window</td>
+  <td>-</td>
+</tr>
+</table>
+
+<ul>
+<li>C-M-u backward-up-list</li>
+<li>C-M-d down-list</li>
+<li>C-M-v scroll-other-window</li>
+<li><del>M-, tags-loop-continue</del></li>
+<li><del>M-. find-tag</del></li>
+<li>C-M-, find-tag-regexp</li>
+</ul>
+
+<h2>削除・コピー</h2>
+<table class="normal center">
+<tr><th>単位</th>
+  <th>後方削除</th>
+  <th>前方削除</th>
+  <th>後方切取</th>
+  <th>前方切取</th>
+  <th>後方複写</th>
+  <th>前方複写</th>
+</tr>
+<tr><td>文字</td>
+  <td><kbd>C-h</kbd><br /><kbd>back</kbd></td>
+  <td><kbd>C-d</kbd><br /><kbd>delete</kbd></td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+<tr><td>単語</td>
+  <td><kbd>C-back</kbd></td>
+  <td><kbd>C-delete</kbd></td>
+  <td><kbd>M-h</kbd><br /><kbd>M-back</kbd></td>
+  <td><kbd>M-d</kbd><br /><kbd>M-delete</kbd></td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+<tr><td>行</td>
+  <td colspan="2">-</td>
+  <td colspan="2"><kbd>C-M-d</kbd><br /><kbd>C-M-h</kbd><br /><kbd>S-delete</kbd></td>
+  <td colspan="2"><kbd>C-S-delete</kbd><br /><kbd>M-S-delete</kbd></td>
+</tr>
+<tr><td>選択</td>
+  <td colspan="2">
+    <kbd>C-h</kbd><br /><kbd>back</kbd><br />
+    <kbd>C-d</kbd><br /><kbd>delete</kbd>
+  </td>
+  <td colspan="2"><kbd>C-w</kbd></td>
+  <td colspan="2"><kbd>M-w</kbd></td>
+</tr>
+<tr><td>行末</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+  <td><kbd>C-k</kbd></td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+</table>
+
+<ul>
+<li>C-h help-command</li>
+<li>M-h mark-defun</li>
+<li>C-M-h mark-paragraph</li>
+<li>C-M-d down-list</li>
+</ul>
+
+<h2>実装メモ</h2>
+
+
+
+<!--************************************************************************-->
+
+<!--************************************************************************-->
+<h3>auto-complete 1.4.0 更新 [2013-08-05 23:26:08 完]</h3>
+<p>auto-complete-1.4.0 を発見したので、
+それを導入して対応する書き換えを実行する。
+</p>
+<ul>
+<li>自分で auto-complete.el, auto-complete-config.el に加えた修正は
+  最新版でもそのまま残っている様子である。
+  なので、そのまま適用する事にした。
+  (但し、auto-complete-config.el の一箇所コメントアウトした物は、
+  最新版でもコメントアウトされていた (やはり同じ問題でも起こったのだろうか)。
+</li>
+<li>mwg.el の中から auto-complete 内部で定義されている関数などにアクセスしている。
+  これらの関数が削除・改名・動作変更されたりして mwg.el で定義した機能が動かなくなっている可能性もある。
+  しかし、見た感じ消えて無くなった機能はないようである。
+</li>
+<li>popup.el, fuzzy.el も新しい物を取ってきてコンパイルし、
+  auto-complete.el, auto-complete-config.el を順次コンパイルして行く。
+  (auto-complete-pkg.el は誰も使っていない? 様なので無視。)
+</li>
+<li>実際に動かしてみると、TAB が効かない。
+  と見てみたら、ac-menu-map というのが追加されていて、
+  TAB による ac-expand-common2 の設定をそちらに定義していなかった。
+  ac-completing-map と同様の設定を ac-menu-map にも追加する事にした。
+</li>
+</ul>
+<p>これで取り敢えず動くようになった。また暫く様子を見て問題が在れば修正する。</p>
+
+<!--************************************************************************-->
+<h3 id="sec.proj1">計画01. ドキュメンテーション 色付け</h3>
+
+<p>ToDo</p>
+<ul>
+<li><del>auto-complete で TAB 補完が効かない → mwg.el が最新版になっていなかった</del></li>
+<li>font-lock-type-face を設定しておくと内部の int 等のキーワードで、mwg-doxygen/title-face が消失する。</li>
+</ul>
+
+<ul>
+<li>(c-literal-limits) はリテラル・コメントの "内部" にいる時に値を返す。
+  リテラルの先頭にいる時を含めてその他の場所にいる時は nil を返す。
+</li>
+</ul>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h4>P1.5 バグ 連続する行コメントがドキュメントとして結合されていない。[完 2013-08-08 23:28:21]</h4>
+<p>どうやら、cc-fonts.el (c-font-lock-doc-comments) のコメントの種類の判定が古い様だ。</p>
+<p>cc-fonts.el () のコメントの種類の判定で、
+parse-partial-sexp の戻り値が t かどうかを見ているが、
+最新の emacs では t から 1 に変更された様である:
+</p>
+<ul>
+<li><a href="http://ftp.gnu.org/old-gnu/Manuals/elisp-manual-21-2.8/html_node/elisp_590.html">elisp emacs-21.2</a></li>
+<li><a href="http://www.gnu.org/software/emacs/manual/html_node/elisp/Parser-State.html#Parser-State">elisp emacs-24.3</a></li>
+</ul>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h4>P1.4 バグ mwg-doxygen.el: bug: // コメントの直後のドキュメンテーションが認識されない [2013-08-08 03:48:42 完]</h4>
+<p>
+<del>これは cc-mode 自体の問題化と思っていたら、javadoc ではちゃんと // コメントの直後のドキュメンテーションも認識されている。</del>
+と思ったが、改めてみると javadoc でも // 直後の行が死んでいる様だ。
+<del>因みに /** ... */ の 2 行目以降はちゃんとドキュメントとして認識されている。</del>
+と思って色々カーソルを動かしたら 2 行目以降もドキュメントとして認識されなくなった。
+何か良く分からないが、やはり cc-mode の問題である。
+</p>
+
+<p>cc-mode については、機能ぐらいにこれを解決しようと思って眺めていたが、
+結局何がいけないのか分からなかった。なので、取り敢えず諦める事にしようかと思う。
+</p>
+<p>と思って再度落ち着いて、前回怪しいと思った所を見たらやっぱり怪しい。
+試しに、emacs 上でそれぞれのコマンドの動作を調べると、バグを発見した。
+結局、関数をコピーして名前を書き換え、それを呼び出して済ませる事にした。
+今の所は問題は起こっていない。
+</p>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h4>P1.3 バグ c-doc-comment-style に変な値が代入されている [2013-08-05 23:26:32 完]</h4>
+<p>C ファイルを開こうとしたら変なメッセージが出ると思ったら、
+c-doc-comment-style の中身が ((c++-mode . mwg-doxygen) . set-from-style) になっている。
+set-from-style でその辺りを検索書けても何も出てこない…。
+</p>
+
+<p>例によって cc-mode.el 辺りのソースコードを調べてみると、
+cc-vars.el に特殊な値として 'set-from-style が設定されている時は、
+ユーザの指定したスタイルの値に従って値を取得すると書いてある。
+スタイルは "k&amp;r" だとかの類で、
+それぞれのスタイル名に対して '((変数名 . 値) ...) の様なリストが設定されている。
+<del>多分、'set-from-style が設定されている時には、
+現在のスタイルに従った値を取得して利用するという事なのだろう。
+しかし、それを実行する為の関数は用意されていない? 様な気がする。
+</del>
+どうやら (c-set-style "k&amp;r") を呼び出した時に、
+バッファ局所変数に値を全てコピーしてしまう様である。
+従って、未だ c-set-style が実行されていない時には何も設定されていないし、
+また、実際にアクセスする時には c-set-style が実行された後という想定という事か?
+</p>
+
+<p>なので適当に、その場で c-doc-comment-style の値を確定させるスクリプトを書く事にした。</p>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h4>P1.2 auto-complete を効かせる [2013-08-04 16:45:45 完]</h4>
+<p>auto-complete を動作するかしないかは ac-disable-faces で決定されている。
+これに 'font-lock-doc-face が含まれている為、
+ドキュメントの内部では補完が働かない。
+</p>
+<p>一つの方法は 'font-lock-doc-face を ac-disable-faces の中から削除する物である:</p>
+<pre class="agh-prog-el">
+(setq ac-disable-faces (delete 'font-lock-doc-face ac-disable-faces))
+</pre>
+<p>しかし、この様にしてしまうとドキュメント内の文章の部分も補完の対象となってしまい、
+入力する時にうるさいし、他の場所で保管する時に文章中の単語が補完されてしまう。
+幸いにして、auto-complete は文法的な位置づけではなく
+face を用いて補完対象かどうかを判定している様なので、
+mwg-doxygen の方で C++ の言語要素と思われる部分について
+font-lock-doc-face を上書きしてしまえば良い?
+</p>
+<p><del>実際に試してみた所、
+上書きする事によって他の箇所からドキュメント内部の単語を参照して補完する事が可能になった。
+(上書きしていない部分の単語については補完候補には出てきていないが、
+上書きした部分の単語については補完候補に含まれている。)
+しかし、ドキュメント内部を編集中に補完を開始する方法が良く分からない。
+というか、ドキュメント内部では、
+単語の途中にカーソルがある場合 (例えば "aiu<strong>|</strong>a" という具合) については、
+何処でも補完が自動的に開始するようである。
+因みに文字列の内部では単語の途中にカーソルがあっても、補完は開始しないようだ。</del>
+</p>
+
+<p>よく見てみるとテストに使用した上書きしていない部分の単語に綴りミスがあった。
+正しい綴りで再度試してみると上書きしていない部分でも補完の候補としてスキャンされている様だ。
+というか、普通に文字列の中身やら通常コメントの中身も補完の候補として表示される。
+また、単語の途中にカーソルがある場合に補完が自動的に開始するのではなくて、
+「mwg-doxygen/content-face 部分の内部にある場合に」補完が自動的に開始するようだ。
+つまり纏めると、
+<del>一番最後に追加された face が ac-disabled-faces に登録されている場合に補完の対象外と見做される。
+(その face が ac-disabled-faces に登録されていても、
+face がそのテキストに対して適用された最後の face でなければ補完は実行される、という事。)</del>
+また、カーソルが disable な face と disable でない face の境界にある時は、補完は実行されない。
+</p>
+
+<p>どうやら、auto-complete.el の
+<code class="agh-prog-el">(ac-cursor-on-diable-face-p)</code> がこの判定を担っている様だ。
+この関数を見ると、get-text-property でカーソルの "右" の文字の 'face を取得している。
+これを左の文字の face を取得する様に変更する。
+</p>
+<p>また、取得した face が ac-disable-faces に含まれるかどうかを memq で判断しているが、
+取得した face が実際は face のリストだった場合に対応していないので、これについても対応する。
+Common Lisp には intersection という関数があるが、
+Emacs Lisp ではこれに対応していないから自分でその都度作れと明言してある。
+<a href="http://www.geocities.co.jp/SiliconValley-Bay/9285/ELISP-JA/elisp_90.html">GNU Emacs Lispリファレンスマニュアル: Sets And Lists</a>
+</p>
+<p>※ と思ったら、 (require 'cl) してから cl-intersection という関数を使えば良いだけの様?</p>
+
+<pre class="agh-prog-el">
+;; the original in auto-complete.el
+(defun ac-cursor-on-diable-face-p (&amp;optional point)
+  (memq (get-text-property (or point (point)) 'face) ac-disable-faces))
+
+;; the new in ~/.emacs
+(defun ac-disable-faces/match (face)
+  (and face
+       (if (listp face)
+           (or (ac-disable-faces/match (car face))
+               (ac-disable-faces/match (cdr face)))
+         (memq face ac-disable-faces))))
+(defun ac-cursor-on-diable-face-p (&amp;optional point)
+  "This function overrides the original function `ac-cursor-on-diable-face-p' in auto-complete.el.
+This function has the different behaviors with original one in the following two points:
+- The original one looks the face after the cursor,
+  but this function looks that before the cursor
+  because the word to be completed is always located before the cursor.
+- This function provides the support for the text with multiple faces
+  which are not supported in the original function."
+  (let ((pt (1- (or point (point)))))
+    (and (&gt;= pt (point-min))
+         (ac-disable-faces/match (get-text-property pt 'face)))))
+</pre>
+
+<p>まとめ</p>
+<ul>
+<li>auto-complete.el: 補完候補は ac-disable-faces に関係なくバッファ全体の文字列から生成される。</li>
+<li>auto-complete.el (<code class="agh-prog-el">ac-cursor-on-diable-face-p</code>): カーソルの右側の face を読み取っていた。</li>
+<li>auto-complete.el (<code class="agh-prog-el">ac-cursor-on-diable-face-p</code>): 複数の face が設定されている場合に対応していなかった。
+  (複数の face が設定されている場合、ac-disable-faces の設定は無効になり、補完が実行される)
+</li>
+<li>修正: カーソルの左側の face を用いて判断する様に変更</li>
+<li>修正: 複数の face が設定されている場合も disable できる様に変更</li>
+</ul>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h4>P1.1 初回実装</h4>
+<p>ドキュメンテーションに色を付けるにはどうしたら良いか?</p>
+<p>始めに見つけたのは以下のページである。</p>
+<p><a href="http://stackoverflow.com/questions/6722682/syntax-highlighting-html-tags-in-doxygen-comments-in-emacs">Syntax highlighting html tags in doxygen comments in emacs - Stack Overflow</a></p>
+<p>適当に改造して以下のコードを作る。</p>
+<pre class="agh-prog-el">
+;; (defconst mwg-font-lock/c-doc-rex "&lt;.+?&gt;")
+(defconst mwg-font-lock/c-doc-rex
+  "\\\\\\(a\\|addindex\\|addtogroup\\|anchor\\|arg\\|attention\\|author\\|b\\|brief\\|bug\\|c\\|callgraph\\|callergraph\\|category\\|class\\|code\\|cond\\|copybrief\\|copydetails\\|copydoc\\|date\\|def\\|defgroup\\|details\\|deprecated\\|dir\\|dontinclude\\|dot\\|dotfile\\|e\\|else\\|elseif\\|em\\|endcode\\|endcond\\|enddot\\|endhtmlonly\\|endif\\|endlatexonly\\|endlink\\|endmanonly\\|endmsc\\|endverbatim\\|endxmlonly\\|enum\\|example\\|exception\\|extends\\|file\\|fn\\|headerfile\\|hideinitializer\\|htmlinclude\\|htmlonly\\|if\\|ifnot\\|image\\|implements\\|include\\|includelineno\\|ingroup\\|internal\\|invariant\\|interface\\|latexonly\\|li\\|line\\|link\\|mainpage\\|manonly\\|memberof\\|msc\\|n\\|name\\|namespace\\|nosubgrouping\\|note\\|overload\\|p\\|package\\|page\\|par\\|paragraph\\|param\\|post\\|pre\\|private\\|privatesection\\|property\\|protected\\|protectedsection\\|protocol\\|public\\|publicsection\\|ref\\|relates\\|relatesalso\\|remarks\\|return\\|retval\\|sa\\|section\\|see\\|showinitializer\\|since\\|skip\\|skipline\\|struct\\|subpage\\|subsection\\|subsubsection\\|test\\|throw\\|todo\\|tparam\\|typedef\\|union\\|until\\|var\\|verbatim\\|verbinclude\\|version\\|warning\\|weakgroup\\|xmlonly\\|xrefitem\\)\\b\\|\\\\\\([@\\&amp;~&lt;&gt;#%]\\|f[][$}]\\|f{[^{}]+}{\\)\\|&lt;[a-zA-Z0-9]+\\( [^&gt;]+\\)?&gt;\\|&lt;/[a-zA-Z0-9]+?&gt;")
+
+(defun mwg-font-lock/c-doc (limit)
+  (while (re-search-forward mwg-font-lock/c-doc-rex limit 'move)
+    (let* ((beg (match-beginning 0))
+          (end (match-end 0))
+          (isBegComment (nth 4 (syntax-ppss beg)))
+          (isEndComment (nth 4 (syntax-ppss end))))
+      (if isBegComment
+          (when isEndComment
+            (c-put-font-lock-face beg end 'font-lock-keyword-face))
+        (goto-char end))))
+  nil)
+
+(defun mwg-font-lock/c-hook ()
+  (font-lock-add-keywords nil '((mwg-font-lock/c-doc))))
+
+(add-hook 'c-mode-common-hook 'mwg-font-lock/c-hook)
+</pre>
+
+<p>と、ここまで作ってから思ったのだが、コメント自体の色をドキュメンテーションの時に変更する事は出来ないのか?
+例えば visual studio では通常のコメントの色と、ドキュメンテーションコメントの色は異なる色で表示する事が出来る。
+</p>
+<ul>
+<li>そこで、取り敢えずどの font-lock-face が見た目的に良さそうか (或いは自分で作った方が良いか) を眺めてみる事にした。
+  と、思ったら font-lock-doc-face という如何にもな物がある…。
+</li>
+<li>一方で、コメント自体に色を付ける事は出来るだろうか、と cc-mode のソースを覗いてみる事にした。
+  <p>例えば、コメントの色を決定する部分と「これが文法的にコメントだ」と判断する部分が異なれば、
+  ドキュメンテーションの時にだけ色を付けるのは比較的簡単に実行できるかも知れない。
+  或いは、コメントだと判断する部分と font-face を font-lock-comment-face に決定する部分が同じであれば、
+  「コメント」の代わりに「ドキュメンテーション」という文法要素を追加しなければ為らず、
+  大幅に cc-mode 自体を書き換えなければならない気がする。
+  </p>
+  <p>と、考えつつ cc-mode.el を眺めていたら、c-doc-comment-style という変数があるという事が判明した。
+  更に、この変数が使用されているのは cc-fonts.el の中である様だ。
+  更に、検索したり cc-vars.el の中を覗いた所 c-doc-comment-style は '((java-mode . javadoc) (pike-mode . autodoc) (c-mode . gtkdoc))
+  などという変数になっていて、ここに適当に javadoc だとか gtkdoc だとかを追加すれば良いようだ。
+  </p>
+  <pre class="agh-prog-el">(add-to-list 'c-doc-comment-style '(hello-mode . javadoc))</pre>
+  <p>更に、自分でドキュメンテーションの種類を追加する事も可能な様子である。
+  cc-vars.el のコメントや cc-fonts.el の *doc の定義の部分を見てみると、
+  どうやら hogedoc-font-lock-keywords 関数を定義しておけば (hoge-mode . hogedoc) 等として追加できるようだ。
+  </p>
+</li>
+<li>という事は c-doc-comment-style 用の doxygen-font-lock-keywords も既にあるのでは?
+  と思って調べてみた所、結構色々な人が作っている様子である。
+  <ul>
+  <li><a href="http://comments.gmane.org/gmane.emacs.cc-mode.general/901">General discussion about the Emacs cc-mode</a></li>
+  <li><a href="http://sourceforge.net/mailarchive/forum.php?forum_name=cc-mode-help&amp;max_rows=25&amp;style=nested&amp;viewmonth=200406">SourceForge.net: CC Mode: cc-mode-help</a></li>
+  <li><a href="https://bitbucket.org/echo68/emacsfiles/src/2bf0139671fa/init.el">echo68 / EmacsFiles / source / init.el ? Bitbucket</a></li>
+  </ul>
+</li>
+</ul>
+
+<p>取り敢えず試しに追加してみる事にする。</p>
+<ul>
+<li>c++-mode に hogedoc を追加する。
+  <p>うまく行かない。有効になっていない。</p>
+  <ul>
+  <li>先ず、.emacs で直接 add-to-list で (c++-mode . hogedoc) 追加しても、
+    未だ cc-mode を読み込んでいないのでエラーになる。</li>
+  <li>c-mode-common-hook の中で実行してみるが動かない。</li>
+  <li>javadoc や gtkdoc など既存の物を指定しても動かない。</li>
+  <li>何処かのページに書いてある様に、c-doc-comment-style を設定した後に
+    c-setup-doc-comment-style を指定しても効果がない。</li>
+  <li>c++-mode-hook の中で同様にしてもうまく行かない。</li>
+  <li>仕様がないので、.emacs で直接 setq で値を設定してみると、c++-mode でも動いた。
+<pre class="agh-prog-el">
+(setq c-doc-comment-style
+      '((c++-mode . mwgdoc)
+        (pike-mode . autodoc)
+        (java-mode . javadoc)
+        (c-mode . gtkdoc)))
+</pre>
+    c++-mode という名前が悪い訳ではなく、やはり初期化のタイミングの問題のようだ。
+    しかし、.emacs で設定してみると案の定 cc-vars.el で追加される設定は追加されなくなってしまう。
+  </li>
+  <li>c++-mode-hook で設定して起動してから、c-doc-comment-style を見たが値はちゃんと設定されている。
+    その後で <code class="agh-prog-el">(c-setup-doc-comment-style)</code> を実行しても効果はない。
+  </li>
+  <li>と思ったら、.emacs で直接 (require 'cc-mode) して
+    (add-to-list 'c-doc-comment-style '(c++-mode . javadoc)) したら普通に動いた。</li>
+  <li>ちゃんと自分で作った (現状では javadoc からコピーして名前を変えただけだが) mwgdoc でも動く。</li>
+  </ul>
+</li>
+<li>javadoc を参考にしながら色々付け加えていく。
+  <ul>
+  <li>一つの一致で複数の face を割り当てるには 0 face prepend nil という所を、
+    (1 face1 prepend nil) (2 face2 prepend nil) (3 face3 prepend nil) 等とすれば良い。
+    但し、その括弧に一致していない状態でこれを呼び出すと、他の箇所の face が変更されてしまって駄目。
+  </li>
+  <li>どうやら (1 face1 prepend nil) の 4 番目は一致していない場合に気にしないかどうからしい。
+    nil だと一致していない場合に error を発生させ、色付けを中断する。
+    t だと一致していない場合は、単に face を適用せずに終わる。
+  </li>
+  </ul>
+</li>
+</ul>
+
+<!--************************************************************************-->
+<h3 id="sec.prob03">問題03. ac-expand-common で候補が更新されなくなる問題 [完 2013/01/25 04:44:51]</h3>
+<p>ac-expand-common という名前の interactive 関数が存在していたので、
+補完中の TAB を ac-expand-common に割り当ててみた。
+然し実際に使ってみると色々と問題点が生じた。
+<del>先ず、ac-expand-common を使って途中まで補完を実行した場合 (?)</del>
+候補が残り一つになる様に文字列を入力して直後に (メニューが更新される前に) TAB を実行すると、
+ac-common-part が更新されていない為に補完が実行されず、
+更に、ac-candidates (ac-common-part も含めて) の更新が中止されてしまい、
+次に文字を入力するまで使えなくなる。
+</p>
+
+<p>そこで、ac-common-part を更新している場所を探した。
+見てみると ac-common-part が設定されるまでの流れは以下の二通りしかない。
+</p>
+<ul>
+<li>
+  <ol>
+  <li>(ac-complete)</li>
+  <li>(ac-update-greedy t)</li>
+  <li>(ac-update force)</li>
+  <li>(ac-candidates)</li>
+  <li>(setq ac-common-part)</li>
+  </ol>
+</li>
+<li>(もしかすると、こちらの流れは起きないかも知れない。
+  途中の条件式で isearch から来た時は流れが止められている気がする。)
+  <ol>
+  <li>(ac-isearch)</li>
+  <li>(ac-show-menu)</li>
+  <li>(ac-update t)</li>
+  <li>(ac-candidates)</li>
+  <li>(setq ac-common-part)</li>
+  </ol>
+</li>
+</ul>
+
+<p>取り敢えず、ac-update 辺りを ac-expand-common の前に呼び出してみる事にした。
+まず気付いた事は、
+新しく自分で作る interactive 関数の名称は ac- で始まるようにしておかないと、
+中で auto-complete の関数を呼び出しても正しく動作しないという事。
+なので、ac-expand-common-interactive などと適当な関数を作ってみた。
+</p>
+
+<p>初めは、ac-expand-common の直後で ac-update や
+ac-reposition やら ac-candidates を呼び出してみたが効果がないようだったので、
+ac-epand-common の直後で ac-update を呼び出してみる事にした。
+しかし、最終確定すると補完結果の先頭文字が欠けてしまう。
+これは ac-update の代わりに ac-update-greedy を実行しても同じであった。
+</p>
+
+<p>仕方がないので ac-expand-common を直接見てみる事にした。
+ac-expand-common の内容を新しく作った ac-expand-common-interactive の中に展開して動作を詳しく見る。
+すると、最終確定時にのみ ac-expand-common 中の ac-expand-string ではなくて
+ac-complete を使って文字列の置換を実行しているという事が判明。
+しかし、この動作は元々 ac-dwim の設定が有効になっている時にのみ有効になるようなので、
+試しに無条件で ac-complete を使わないように変更したら期待通りの動作になった。
+</p>
+
+<h3>ac-common-part は、候補がアルファベット順に並んでいる時にしか正しくない? [完 2013/01/25 05:02:09]</h3>
+<p>再び auto-complete.el の中を覗いてみた。
+ac-common-part を設定している部分は三箇所在るが、
+その内の二箇所は emacs の try-completion 関数を用いて
+candidates 配列に入った物の共通一致部分を求めている。
+一箇所は candidates の先頭部分を単に拾っている様に見える。
+</p>
+<p>一方で、同時に ac-whole-common-part という変数にも値が設定されていて、
+ac-common-part が try-completion を使って計算される時は、
+ac-whole-common-part は 単なる ac-common-part の複製となり、
+ac-common-part が candidates の先頭部分の時も、
+ac-whole-common-part は try-completion で改めて計算された物となっている。
+つまり、ac-whole-common-part は常に正しい共通部分になっているが、
+ac-common-part は気分で変わりうる物のように見える。
+</p>
+<p>そこで、自分で作った ac-expand-common2 関数の中の、
+ac-common-part の部分を全て ac-whole-common-part に置き換えて見た。
+すると正に期待した通りの動作をするようになった。
+良かった。
+</p>
+
+<!--************************************************************************-->
+<h3 id="sec.prob02">問題02. ttx-mode の色付けで処理に時間が掛かる問題</h3>
+<ul>
+<li>.ttx 中に , が存在するとそれだけで無限ループになっている様子である</li>
+<li>search-backward-regexp を使っている部分は関係ない。</li>
+<li><del>どうもエラーが起こる場合でも無限ループになる様だ?</del></li>
+</ul>
+<pre class="agh-prog-el">
+(defun ttx-font-lock-common-impl1 (limit)
+  (if (search-forward "warning" nil 0)
+      (set-text-properties 
+       (match-beginning 0) (match-end 0) '(face font-lock-warning-face))
+    nil))
+(defun ttx-font-lock-common-sample (limit)
+  (if (search-forward "warning" nil 0)
+      (add-text-properties 
+       (match-beginning 0) (match-end 0) '(face font-lock-warning-face))
+    nil))
+</pre>
+<p>色々試してみた所、上記の二つ目の関数では無限ループにならないが、
+一つ目の関数では無限ループになる様だ。
+二つの関数は set-text-properties と add-text-properties が異なるだけである。
+つまり、set-text-properties を使用すると、
+今迄の何らかの情報が削除されるからなのか何なのか知らないが、
+再度計算のし直しになると言う事で無限ループになるとかそんな所であろうか。
+</p>
+
+<!--************************************************************************-->
+<h3 id="sec.prob01">問題01. ttx-mode の色付け, うまく動かない</h3>
+<ul>
+<li><del>どうやら add-text-properties を二回以上呼び出すと変なことになるようだ。
+  (最後に呼び出した add-text-properties しか有効になっていない?)</del>
+</li>
+<li><del>と思ったら、多分、色を付けた最後の位置を記録していて、
+  最後の位置が単語の最後の位置に一致していないと変な事になる?</del>
+</li>
+<li>実は重要なのは戻り値で、何処まで色を付けたかの位置を返す必要がある様だ。</li>
+</ul>
+
+<!--************************************************************************-->
+<h2>変更履歴 (ChangeLog)</h2>
+<ul>
+<li>2014-07-21, KM,
+  <ul>
+  <li>mwg.el: (c-set-offset arglist-cont-nonempty '+) 引数リストを途中で切った場合のインデントの設定。</li>
+  </ul>
+</li>
+<li>2014-04-16, KM,
+  <ul>
+  <li>mwg.el: auto-complete で RET を通常の改行に。</li>
+  <li>ttx-mode.el: indent の修正。</li>
+  </ul>
+</li>
+<li>2013-08-26, KM,
+  <ul>
+  <li>mwg.el: isearch-mode-map, C-SPC or C-@ で一致範囲を選択する様に変更。</li>
+  <li>mwg.el: exchange-point-and-mark, nomark として登録していたが不便なので止める
+    (そもそも何故 nomark にしたのか覚えていない)</li>
+  <li>mwg.el (mwg-pcmark): 移動コマンドの定義を大幅に書き直し。
+      elisp について知識が増えたのでより簡潔な記述に。</li>
+  </ul>
+</li>
+<li>2013-08-08, KM,
+  <ul>
+  <li>mwg-doxygen.el: bugfix: "//" の直後のコメントがドキュメントとして認識されない問題。</li>
+  <li>mwg-doxygen.el: bugfix: コメントの開始またはインデントを巻き込んでメールアドレスと認識される問題。</li>
+  <li>mwg-doxygen.el: 色付け部分を大幅に改造: face をその場で S 式の評価で決定できる様に, face の remove に対応, </li>
+  <li>mwg-doxygen.el: tex 部分の色付け</li>
+  <li>mwg-doxygen.el: xml 部分の色付け</li>
+  <li>mwg-doxygen.el: bugfix: cc-fonts.el (c-font-lock-doc-comments) のコメントの種類の判定が古い。</li>
+  <li>mwg-doxygen.el: bugfix: doc-comment 導入部と doc-comment 内容部分を分ける正規表現の問題。</li>
+  <li>mwg-doxygen.el: 複数行に亙るマークアップの改善</li>
+  </ul>
+</li>
+<li>2013-08-06, KM,
+  <ul>
+  <li>mwg.el: mwg-doxygen.el の読込設定を eval-after-load "cc-mode" で実行する事にした。</li>
+  <li>mwg-doxygen.el: bugfix mwg-doxygen/file-face, mwg-doxygen/label-face の :inherit の順序</li>
+  <li>mwg-doxygen.el: \f$...\f$ \f[...\f] の対応。</li>
+  </ul>
+</li>
+<li>2013-08-05, KM,
+  <ul>
+  <li>mwg.el: コメントの色を少し暗く変更</li>
+  <li>mwg-c++exp.el: bugfix:
+    :: で始まるコメント行があったのを ;; に修正。
+    今迄は単に無視されていた様子。</li>
+  <li>mwg-doxygen.el: 作成</li>
+  <li>ttx-mode.el: ロードの仕方を変更</li>
+  </ul>
+</li>
+<li>2013-07-07, KM,
+  <ul>
+  <li>mwg.el: bugfix, 色の数が少ない時でも region を反転させる様に修正。</li>
+  <li>mwg.el: 16色の場合の設定に対応。大体の場合は一番近い色として適当な物を選んでくれる。</li>
+  <li>mwg.el (mwg-forward-word2, mwg-backward-word2): [bugfix] w-or-k 変数で _ を除外していた (空白文字として扱っている事に相当する)。</li>
+  </ul>
+</li>
+<li>2013-07-02, KM,
+  <ul>
+  <li>ttx-mode.el: bugfix: 二重引用符の中で引用符を使った場合に以降の色付けが無効になる問題</li>
+  </ul>
+</li>
+<li>2013-06-09, KM,
+  <ul>
+  <li>mwg.el: \f を基準にした移動 mwg-prev-page, mwg-next-page を定義し、
+    C-prior 及び C-next に割り当て。
+  </li>
+  </ul>
+</li>
+<li>2013-06-08, KM,
+  <ul>
+  <li>term/rosaterm.el:
+    rosaterm で修飾された通常文字のエスケープシーケンスを
+    \e[27;<var>mod</var>;<var>char</var>~ 形式に変更したので、
+    これに対応。
+  </li>
+  </ul>
+</li>
+<li>2013-05-11, KM,
+  <ul>
+  <li>mwg.el: mwg-xml-tag-region でクラス名, id をそれぞれ . # で指定できる様に拡張。</li>
+  </ul>
+</li>
+<li>2013-05-09, KM,
+  <ul>
+  <li>mwg.el: xml-mode に \C-&lt; \C-&gt;, \C-&amp; を追加。</li>
+  <li>mwg.el: xml-mode で選択範囲を指定したタグで囲む関数 mwg-xml-tag-region を追加。\C-c\C-c で実行。</li>
+  </ul>
+</li>
+<li>2013-05-08, KM,
+  <ul>
+  <li>mwg.el: [bugfix] mwg-c++exp mode の機能が global-set-key で設定されていたのを、local-set-key に変更</li>
+  <li>mwg.el: [bugfix] beginning-of-buffer/end-of-buffer の global-set-key が重複していたのを修正</li>
+  <li>mwg.el: mwg-isearch-forward-word, 単語判定を一から自分で書く事にした。</li>
+  <li>mwg.el: &lt;f5&gt; で挿入する日時の、日付部分の区切を "/" から "-" に変更。</li>
+  </ul>
+</li>
+<li>2013/05/06, KM,
+  <ul>
+  <li>mwg.el: mwg-add-hook-bashrc 追加。bash の C-x C-e によるコマンド編集で sh-mode を起動するように変更</li>
+  <li>mwg.el (mwg-isearch-forward-word, mwg-isearch-forword-word2):
+    単語切出をモード非依存に変更。モード依存の単語を検索する場合は mwg-isearch-forward-word2 (M-f w) を用いるように変更。
+  </li>
+  </ul>
+</li>
+<li>2013/03/09, KM,
+  <ul>
+  <li>mwg.el: [bugfix] C-h に delete-char を割り当てていたのを delete-backward-char に修正。
+    <p>今迄気付かなかったのは C-h → DEL → delete-backward-char と解釈されていた為。</p>
+  </li>
+  </ul>
+</li>
+<li>2013/02/28, KM,
+  <ul>
+  <li>ttx-mode.el: [bugfix] 文字列リテラル内の # をコメントとして扱ってしまっていたのを修正。</li>
+  <li>ttx-mode.el: 色付けを大幅に変更, 一から書き直した, 複数行の文字列リテラル, フィールド名の色付け, 等に対応。</li>
+  <li>ttx-mode.el: [bugfix] 色付けで無限ループになっているらしいのを修正。</li>
+  <li>ttx-mode.el: [bugfix] 文字列の複数行に亙る色付けを正しく動作する様に修正。</li>
+  <li>ttx-mode.el: 文字列中のエスケープシーケンスのフォント設定。</li>
+  <li>ttx-mode.el: [bugfix] "\\\n" を含む文字列リテラルを認識しないのを修正。/\\./ が "\\\n" に一致しないのが問題だった。</li>
+  <li>ttx-mode.el: 文字列中の不正エスケープシーケンスに対する警告フォント設定。</li>
+  </ul>
+</li>
+<li>2013/02/06, KM,
+  <ul>
+  <li>ttx-mode.el: [bugfix] 空文字列リテラルに対応。</li>
+  </ul>
+</li>
+</ul>
+</body>
+</html>
