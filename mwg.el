@@ -127,6 +127,16 @@ This function has the different behaviors with original one in the following two
 (defun mwg-add-hook-bashfc ()
   (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-mode) auto-mode-alist)))
 
+;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
+(eval-when-compile
+  (declare-function sh-mode "sh-script")
+  (declare-function sh-set-shell "sh-script"))
+(defun sh-bash-mode ()
+  (interactive)
+  (require 'sh-script)
+  (sh-mode)
+  (sh-set-shell "bash"))
+
 ;;---- xml-mode ---------------------------------------------------------------
 (defvar mwg-xml-tag-region/previous-tagname "xml")
 (defun mwg-xml-tag-region (tagname)
@@ -258,7 +268,8 @@ This function has the different behaviors with original one in the following two
     (setq indent-line-function 'tab-to-tab-stop)
     (add-hook 'text-mode-hook
               (lambda ()
-                (setq indent-line-function 'tab-to-tab-stop)))
+                (setq indent-line-function 'tab-to-tab-stop)
+                (put-text-property (point) (mark) 'face nil)))
 
     ;;--------------------
     ;; 再帰にすると再帰深度エラーになる。
@@ -291,13 +302,17 @@ This function has the different behaviors with original one in the following two
                                                                    sh-indentation w
                                                                    sh-indent-for-case-label 0
                                                                    sh-indent-for-case-alt '+)))
+      (funcall defunw 'mwg-tabwidth-perl-mode-hook (lambda (w) (setq perl-indent-level w
+                                                                     perl-continued-statement-offset w
+                                                                     perl-brace-offset (- w)
+                                                                     perl-label-offset (- w))))
+
       (add-hook 'awk-mode-hook 'mwg-tabwidth-c-mode-hook)
+      (add-hook 'php-mode-hook 'mwg-tabwidth-c-mode-hook)
       (add-hook 'sh-mode-hook 'mwg-tabwidth-sh-mode-hook)
       (add-hook 'js-mode-hook 'mwg-tabwidth-js-mode-hook)
-      (add-hook 'css-mode-hook 'mwg-tabwidth-css-mode-hook))
-    
-    ;; c-mode-hook
-    ;; c++-mode-hook
+      (add-hook 'css-mode-hook 'mwg-tabwidth-css-mode-hook)
+      (add-hook 'perl-mode-hook 'mwg-tabwidth-perl-mode-hook))
     ;; objc-mode-hook
     ;; java-mode-hook
     ;; idl-mode-hook
