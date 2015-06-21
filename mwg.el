@@ -252,7 +252,11 @@ This function has the different behaviors with original one in the following two
   (defvar sh-basic-offset)
   (defvar sh-indentation)
   (defvar sh-indent-for-case-label)
-  (defvar sh-indent-for-case-alt))
+  (defvar sh-indent-for-case-alt)
+  (defvar perl-indent-level)
+  (defvar perl-continued-statement-offset)
+  (defvar perl-brace-offset)
+  (defvar perl-label-offset))
 
 (defun mwg-init-tabwidth (&optional width0)
   (let ((width (if width0 width0 2)))
@@ -269,7 +273,7 @@ This function has the different behaviors with original one in the following two
     (add-hook 'text-mode-hook
               (lambda ()
                 (setq indent-line-function 'tab-to-tab-stop)
-                (put-text-property (point) (mark) 'face nil)))
+                (put-text-property (point-min) (point-max) 'face nil)))
 
     ;;--------------------
     ;; 再帰にすると再帰深度エラーになる。
@@ -366,7 +370,7 @@ This function has the different behaviors with original one in the following two
 ;;-----------------------------------------------------------------------------
 
 ;; change \C-s: isearch-forward -> save-buffer
-(global-set-key "\C-s"     'save-buffer)
+;; (global-set-key "\C-s"     'save-buffer)
 
 (global-unset-key "\M-g")
 (global-set-key "\M-g\M-g" 'goto-line)
