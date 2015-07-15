@@ -273,7 +273,8 @@ This function has the different behaviors with original one in the following two
     (add-hook 'text-mode-hook
               (lambda ()
                 (setq indent-line-function 'tab-to-tab-stop)
-                (put-text-property (point-min) (point-max) 'face nil)))
+                ;; (put-text-property (point-min) (point-max) 'face nil)
+                ))
 
     ;;--------------------
     ;; 再帰にすると再帰深度エラーになる。
