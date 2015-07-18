@@ -29,6 +29,8 @@ $(MYDIR)/%file%c: $(MYDIR)/%file%
 #%end
 #%x term::add.r|%file%|term/cygwin.el|
 #%x term::add.r|%file%|term/rosaterm.el|
+copyfiles+=$(MYDIR)/term/screen.el
+$(MYDIR)/term/screen.el: term/screen.el | $(MYDIR)/term
 
 dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
 #%m lisp::add

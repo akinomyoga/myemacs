@@ -41,6 +41,8 @@ copyfiles+=$(MYDIR)/term/rosaterm.el
 compilefiles+=$(MYDIR)/term/rosaterm.elc
 $(MYDIR)/term/rosaterm.el: term/rosaterm.el | $(MYDIR)/term
 $(MYDIR)/term/rosaterm.elc: $(MYDIR)/term/rosaterm.el
+copyfiles+=$(MYDIR)/term/screen.el
+$(MYDIR)/term/screen.el: term/screen.el | $(MYDIR)/term
 
 dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
 copyfiles+=$(EMACSD)/lisp/dropdown-list.el
