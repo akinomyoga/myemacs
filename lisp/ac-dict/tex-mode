@@ -1,0 +1,26 @@
+# \begin
+begin
+end
+document
+math
+equation
+displaymath
+eqnarray
+eqnarray*
+# \documentclass
+documentclass
+article
+jarticle
+jsarticle
+book
+jbook
+jsbook
+# \usepackage
+usepackage
+amsmath
+amssymb
+graphicx
+latexsym
+# commands
+boldsymbol
+boldmath
