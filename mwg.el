@@ -29,10 +29,13 @@
 
 (defun mwg-add-hook-auto-complete ()
   (require 'auto-complete-config)
-  (add-to-list 'ac-dictionary-directories "~/.emacs.d/lisp/ac-dict")
+  ;; (add-to-list 'ac-dictionary-directories "~/.emacs.d/lisp/ac-dict")
+  (setq ac-modes (append ac-modes (list 'tex-mode 'latex-mode 'awk-mode 'csharp-mode)))
   (ac-config-default)
 
   ;;---- settings & user defined functions ---------------------------
+
+  (setq ac-auto-start 3)
 
   ;; TAB で共通部分だけを確定。第一候補選択は C-j で。
   ;; \brief 共通部分だけを確定し続きの入力を求める
@@ -103,9 +106,8 @@ This function has the different behaviors with original one in the following two
     (define-key ac-menu-map "\C-j"   'ac-expand))
 
   (define-key ac-mode-map "\C-j" 'auto-complete)
-  (setq ac-auto-start 3)
 
-  (setq ac-modes (append ac-modes (list 'tex-mode 'latex-mode 'awk-mode 'csharp-mode))))
+)
 
 ;;---- gnuplot-mode -----------------------------------------------------------
 (defun mwg-add-hook-gnuplot (gnuplot-path)

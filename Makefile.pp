@@ -6,74 +6,76 @@ all:
 EMACSD:=$(HOME)/.emacs.d
 MYDIR:=$(EMACSD)/my
 
-dirs+=$(MYDIR)
-#%m my::add
-copyfiles+=$(MYDIR)/%file%
-compilefiles+=$(MYDIR)/%file%c
-$(MYDIR)/%file%: %file% | $(MYDIR)
-$(MYDIR)/%file%c: $(MYDIR)/%file%
-#%end
-#%x my::add.r|%file%|mwg.el|
-#%x my::add.r|%file%|mwg-c++exp.el|
-#%x my::add.r|%file%|mwg-doxygen.el|
-#%x my::add.r|%file%|mwg-js2-config.el|
-#%x my::add.r|%file%|ttx-mode.el|
-#%x my::add.r|%file%|css-mode.el|
+#%#------------------------------------
+#%m mylisp::copy
+#%%[fdst="%file%"]
+#%%[fsrc=fdst.replace("^my/","")]
+#%%x
+# mylisp::copy %file%
+copyfiles+=$(EMACSD)/%file%
+$(EMACSD)/%file%: ${fsrc} | $(EMACSD)%directory%
 
-dirs+=$(MYDIR)/term
-#%m term::add
-copyfiles+=$(MYDIR)/%file%
-compilefiles+=$(MYDIR)/%file%c
-$(MYDIR)/%file%: %file% | $(MYDIR)/term
-$(MYDIR)/%file%c: $(MYDIR)/%file%
+#%%end.i
 #%end
-#%x term::add.r|%file%|term/cygwin.el|
-#%x term::add.r|%file%|term/rosaterm.el|
-copyfiles+=$(MYDIR)/term/screen.el
-$(MYDIR)/term/screen.el: term/screen.el | $(MYDIR)/term
-
-dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
-#%m lisp::add
+#%#------------------------------------
+#%m mylisp::elc
+#%%[fdst="%file%"]
+#%%[fsrc=fdst.replace("^my/","")]
+#%%x
+# mylisp::elc %file%
 copyfiles+=$(EMACSD)/%file%
 compilefiles+=$(EMACSD)/%file%c
-$(EMACSD)/%file%: %file% | $(EMACSD)/lisp $(EMACSD)/lisp/auto-install
+$(EMACSD)/%file%: ${fsrc} | $(EMACSD)%directory%
 $(EMACSD)/%file%c: $(EMACSD)/%file%
-#%end
-#%x
-add lisp/dropdown-list.el;
-add lisp/fuzzy.el;
-add lisp/popup.el;
-add lisp/auto-complete.el;
-add lisp/auto-complete-config.el;
-add lisp/auto-install.el;
-add lisp/csharp-mode.el;
-add lisp/gnuplot.el;
-add lisp/yasnippet.el;
-add lisp/auto-install/anything.el;
-add lisp/auto-install/anything-auto-install.el;
-add lisp/auto-install/anything-complete.el;
-add lisp/auto-install/anything-config.el;
-add lisp/auto-install/anything-grep.el;
-add lisp/auto-install/anything-gtags.el;
-add lisp/auto-install/anything-ipa.el;
-add lisp/auto-install/anything-match-plugin.el;
-add lisp/auto-install/anything-menu.el;
-add lisp/auto-install/anything-migemo.el;
-add lisp/auto-install/anything-obsolete.el;
-add lisp/auto-install/anything-show-completion.el;
-add lisp/auto-install/anything-startup.el;
-add lisp/auto-install/descbinds-anything.el;
-add lisp/auto-install/ipa.el;
-add lisp/auto-install/popwin.el;
-#%end .r=add =#%x lisp::add.r|%file%|= .r=;=|=
 
-dirs+=$(EMACSD)/lisp/ac-dict
-#%m lisp::resource
-copyfiles+=$(EMACSD)/%file%
-$(EMACSD)/%file%: %file% | $(EMACSD)/lisp $(EMACSD)/lisp/ac-dict
+#%%end.i
 #%end
-Makefile: lisp/ac-dict
-#%$ls -1 lisp/ac-dict/*-mode | awk '{print "#%x lisp::resource.r|%file%|" $0 "|";}'
+#%#------------------------------------
+#%m 1
+dirs+=$(MYDIR) $(MYDIR)/term
+elc my/mwg.el;
+elc my/mwg-c++exp.el;
+elc my/mwg-doxygen.el;
+elc my/mwg-js2-config.el;
+elc my/ttx-mode.el;
+elc my/css-mode.el;
+elc my/term/cygwin.el;
+elc my/term/rosaterm.el;
+copy my/term/screen.el;
+
+dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
+elc lisp/csharp-mode.el;
+elc lisp/gnuplot.el;
+
+# elc lisp/fuzzy.el;
+# elc lisp/popup.el;
+# elc lisp/auto-complete.el;
+# elc lisp/auto-complete-config.el;
+
+# elc lisp/dropdown-list.el;
+# elc lisp/yasnippet.el;
+
+# elc lisp/auto-install.el;
+# elc lisp/auto-install/anything.el;
+# elc lisp/auto-install/anything-auto-install.el;
+# elc lisp/auto-install/anything-complete.el;
+# elc lisp/auto-install/anything-config.el;
+# elc lisp/auto-install/anything-grep.el;
+# elc lisp/auto-install/anything-gtags.el;
+# elc lisp/auto-install/anything-ipa.el;
+# elc lisp/auto-install/anything-match-plugin.el;
+# elc lisp/auto-install/anything-menu.el;
+# elc lisp/auto-install/anything-migemo.el;
+# elc lisp/auto-install/anything-obsolete.el;
+# elc lisp/auto-install/anything-show-completion.el;
+# elc lisp/auto-install/anything-startup.el;
+# elc lisp/auto-install/descbinds-anything.el;
+# elc lisp/auto-install/ipa.el;
+# elc lisp/auto-install/popwin.el;
+#%end
+#%m 1 1.R=\y(elc|copy) ([^\n;]+)/([^\n;]+);=#%x mylisp::$1.r|%directory%|/$2|.r|%file%|$2/$3|=
+#%m 1 1.R=\y(elc|copy) ([^\n;]+);=#%x mylisp::$1.r|%directory%||.r|%file%|$2|=
+#%x 1
 
 $(dirs):
 	mkdir -p $@
@@ -82,7 +84,14 @@ $(copyfiles):
 
 .SUFFIXES: .elc .el
 .el.elc:
-	emacs -batch -L . -L lisp -L lisp/auto-install -L $(EMACSD)/elpa/js2-mode-*/ -f batch-byte-compile $<
+	emacs -batch -L . -L lisp -L lisp/auto-install -eval '(package-initialize)' -f batch-byte-compile $<
 
 all:
-install: $(copyfiles) $(compilefiles)
+
+packages+=js2-mode
+packages+=auto-complete
+package-install:
+	./make_command.sh package-install $(packages)
+copyfiles: $(copyfiles)
+compilefiles: $(compilefiles) | package-install
+install: package-install copyfiles compilefiles
