@@ -90,11 +90,9 @@ all:
 
 packages+=js2-mode
 packages+=auto-complete
-package-install:
+package-install $(MYDIR)/package-install.stamp: | $(MYDIR)
 	./make_command.sh package-install $(packages)
-$(MYDIR)/package-install.stamp:
-	./make_command.sh package-install $(packages)
-	touch $@
+	touch $(MYDIR)/package-install.stamp
 copyfiles: $(copyfiles)
 compilefiles: $(compilefiles) | $(MYDIR)/package-install.stamp
 install: copyfiles compilefiles
