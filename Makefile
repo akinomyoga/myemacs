@@ -61,12 +61,7 @@ $(EMACSD)/my/term/screen.el: term/screen.el | $(EMACSD)/my/term
 
 
 dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
-# mylisp::elc lisp/csharp-mode.el
-copyfiles+=$(EMACSD)/lisp/csharp-mode.el
-compilefiles+=$(EMACSD)/lisp/csharp-mode.elc
-$(EMACSD)/lisp/csharp-mode.el: lisp/csharp-mode.el | $(EMACSD)/lisp
-$(EMACSD)/lisp/csharp-mode.elc: $(EMACSD)/lisp/csharp-mode.el
-
+#%x mylisp::elc.r|%directory%|/lisp|.r|%file%|lisp/csharp-mode.el|
 # mylisp::elc lisp/gnuplot.el
 copyfiles+=$(EMACSD)/lisp/gnuplot.el
 compilefiles+=$(EMACSD)/lisp/gnuplot.elc
