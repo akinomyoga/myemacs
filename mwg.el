@@ -13,9 +13,11 @@
   (let ((target-map (if (boundp 'input-decode-map)
                          input-decode-map
                        function-key-map)))
+
+    ;; from GNOME Terminal
     (define-key target-map "\e[1;2h" [S-home])
-    (define-key target-map "\e[1;2h" [M-home])
-    (define-key target-map "\e[1;2h" [S-M-home])
+    (define-key target-map "\e[1;3h" [M-home])
+    (define-key target-map "\e[1;4h" [S-M-home])
     (define-key target-map "\e[1;5h" [C-home])
     (define-key target-map "\e[1;6h" [C-S-home])
     (define-key target-map "\e[1;7h" [C-M-home])
