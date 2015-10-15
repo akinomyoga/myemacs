@@ -1,5 +1,35 @@
 ;; .emacs settings -*- coding:utf-8 -*-
 
+
+;;*****************************************************************************
+;;
+;; Input Decodes
+;;
+;;=============================================================================
+;; settings for auto-complete
+;;-----------------------------------------------------------------------------
+
+(defun xterm-additional-keymap ()
+  (let ((target-map (if (boundp 'input-decode-map)
+                         input-decode-map
+                       function-key-map)))
+    (define-key target-map "\e[1;2h" [S-home])
+    (define-key target-map "\e[1;2h" [M-home])
+    (define-key target-map "\e[1;2h" [S-M-home])
+    (define-key target-map "\e[1;5h" [C-home])
+    (define-key target-map "\e[1;6h" [C-S-home])
+    (define-key target-map "\e[1;7h" [C-M-home])
+    (define-key target-map "\e[1;8h" [C-S-M-home])
+    (define-key target-map "\e[1;2f" [S-end])
+    (define-key target-map "\e[1;3f" [M-end])
+    (define-key target-map "\e[1;4f" [S-M-end])
+    (define-key target-map "\e[1;5f" [C-end])
+    (define-key target-map "\e[1;6f" [C-S-end])
+    (define-key target-map "\e[1;7f" [C-M-end])
+    (define-key target-map "\e[1;8f" [C-S-M-end])))
+
+(xterm-additional-keymap)
+
 ;;*****************************************************************************
 ;;
 ;; Loading Other Libraries
