@@ -308,18 +308,7 @@ This function has the different behaviors with original one in the following two
                 (with-silent-modifications
                   (put-text-property (point-min) (point-max) 'face nil))))
 
-    ;;--------------------
-    ;; 再帰にすると再帰深度エラーになる。
-    ;; (let* (generate-tab-stop-list
-    ;;        (generate-tab-stop-list
-    ;;         (lambda (begin end step)
-    ;;           (if (<= begin end)
-    ;;               (cons begin (funcall generate-tab-stop-list (+ begin step) end step))
-    ;;             '())))
-    ;;        (mwg-tabwidth-tab-stop-list
-    ;;         (funcall generate-tab-stop-list width 210 width)))
-    ;;   (setq-default tab-stop-list mwg-tabwidth-tab-stop-list)
-    ;;   (setq         tab-stop-list mwg-tabwidth-tab-stop-list))
+    ;; ※再帰にすると再帰深度エラーになる。
     (let* ((tabstop (* (/ 210 width) width))
            (list ()))
       (while (> tabstop 0)
@@ -354,7 +343,9 @@ This function has the different behaviors with original one in the following two
     ;; java-mode-hook
     ;; idl-mode-hook
     ;; pike-mode-hook
-    ))
+    )
+
+  (add-hook 'makefile-mode-hook '(lambda () (setq tab-width 8))))
 
 (add-hook 'c-mode-hook '(lambda ()
                           (c-set-offset 'arglist-close 0)
@@ -367,6 +358,7 @@ This function has the different behaviors with original one in the following two
                           (c-set-offset 'arglist-intro '+)
                           (c-set-offset 'arglist-cont 0)
                           (c-set-offset 'arglist-cont-nonempty '+)
+                          (c-set-offset 'template-args-cont '+)
                           ))
 
 ;******************************************************************************

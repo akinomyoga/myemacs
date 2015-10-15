@@ -44,7 +44,7 @@ elc my/term/rosaterm.el;
 copy my/term/screen.el;
 
 dirs+=$(EMACSD)/lisp $(EMACSD)/lisp/auto-install
-elc lisp/csharp-mode.el;
+#elc lisp/csharp-mode.el;
 elc lisp/gnuplot.el;
 
 # elc lisp/fuzzy.el;
