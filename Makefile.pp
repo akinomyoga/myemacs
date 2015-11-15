@@ -80,7 +80,7 @@ elc lisp/gnuplot.el;
 $(dirs):
 	mkdir -p $@
 $(copyfiles):
-	cp -p $< $@
+	cp $< $@
 
 .SUFFIXES: .elc .el
 .el.elc:

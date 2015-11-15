@@ -17,12 +17,15 @@
   (xterm-register-default-colors)
   (tty-set-up-initial-frame-faces)
   (cond
-   ((string= (getenv "MWG_LOGINTERM") "rosaterm")
-    (load "term/rosaterm")
-    (rosaterm-register-keymap))
    ((string= (getenv "MWG_LOGINTERM") "cygwin")
     (load "term/cygwin")
     (cygwin-register-keymap))
+   ((string= (getenv "MWG_LOGINTERM") "rosaterm")
+    (load "term/rosaterm")
+    (rosaterm-register-keymap))
+   (t
+    (load "term/rosaterm")
+    (rosaterm-register-keymap))
    ))
 
 ;; screen.el ends here
