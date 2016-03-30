@@ -10,25 +10,27 @@
 ;;-----------------------------------------------------------------------------
 
 (defun xterm-additional-keymap ()
-  (let ((target-map (if (boundp 'input-decode-map)
+  (let* ((target-map (if (boundp 'input-decode-map)
                          input-decode-map
-                       function-key-map)))
-
+                       function-key-map))
+         (register (lambda (key def)
+                     (define-key target-map key def))))
+    
     ;; from GNOME Terminal
-    (define-key target-map "\e[1;2h" [S-home])
-    (define-key target-map "\e[1;3h" [M-home])
-    (define-key target-map "\e[1;4h" [S-M-home])
-    (define-key target-map "\e[1;5h" [C-home])
-    (define-key target-map "\e[1;6h" [C-S-home])
-    (define-key target-map "\e[1;7h" [C-M-home])
-    (define-key target-map "\e[1;8h" [C-S-M-home])
-    (define-key target-map "\e[1;2f" [S-end])
-    (define-key target-map "\e[1;3f" [M-end])
-    (define-key target-map "\e[1;4f" [S-M-end])
-    (define-key target-map "\e[1;5f" [C-end])
-    (define-key target-map "\e[1;6f" [C-S-end])
-    (define-key target-map "\e[1;7f" [C-M-end])
-    (define-key target-map "\e[1;8f" [C-S-M-end])))
+    (funcall register "\e[1;2h" [S-home])
+    (funcall register "\e[1;3h" [M-home])
+    (funcall register "\e[1;4h" [S-M-home])
+    (funcall register "\e[1;5h" [C-home])
+    (funcall register "\e[1;6h" [C-S-home])
+    (funcall register "\e[1;7h" [C-M-home])
+    (funcall register "\e[1;8h" [C-S-M-home])
+    (funcall register "\e[1;2f" [S-end])
+    (funcall register "\e[1;3f" [M-end])
+    (funcall register "\e[1;4f" [S-M-end])
+    (funcall register "\e[1;5f" [C-end])
+    (funcall register "\e[1;6f" [C-S-end])
+    (funcall register "\e[1;7f" [C-M-end])
+    (funcall register "\e[1;8f" [C-S-M-end])))
 
 (xterm-additional-keymap)
 
