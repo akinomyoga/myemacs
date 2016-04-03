@@ -173,6 +173,9 @@ This function has the different behaviors with original one in the following two
   (sh-mode)
   (sh-set-shell "bash"))
 
+;; http://unix.stackexchange.com/questions/20121/how-to-disable-emacs-here-document-completion
+(add-hook 'sh-mode-hook '(lambda () (sh-electric-here-document-mode -1)))
+
 ;;---- xml-mode ---------------------------------------------------------------
 (defvar mwg-xml-tag-region/previous-tagname "xml")
 (defun mwg-xml-tag-region (tagname)
