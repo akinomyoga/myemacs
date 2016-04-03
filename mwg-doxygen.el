@@ -178,12 +178,8 @@
     `(
       ;; ("^\\(?:/\\*[*!]<?\\|//[/!]<?\\|[[:space:]*]+\\)[[:space:]]*\\|\\(.+\\)$" ;; content
       ;;  1 'mwg-doxygen/content-face prepend t)
-      ("^[[:space:]]*\\(?:/\\*[*!]<?\\|//[/!]<?\\|\\*\\)[[:space:]]?\\|^\\([[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
-       (let ((mend (match-end 1)))
-         (and mend
-              (not (save-excursion (goto-char mend) (looking-at-p "$")))
-              '(1 'mwg-doxygen/content-face prepend t)))
-       (2 'mwg-doxygen/content-face prepend t))
+      ("^[[:space:]]*\\(?:/\\*[*!]<?\\|//[/!]<?\\|\\*\\)[[:space:]]?\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
+       (1 'mwg-doxygen/content-face prepend t))
       (,(let* ((rex_id "\\(?:\\_<.\\)\\(?:\\sw\\|_\\)*")
                ;;(rex_id "\\(?:\\_<\\sw\\|\\B_\\|^_\\)\\(?:\\sw\\|_\\)*")
                ;;↑これだと _ の連続に対し超線形になる。_ の開始をうまく捉えられていない。
@@ -382,8 +378,9 @@
       )))
 
 (defconst mwg-doxygen/tex-keylist
-  '((".+"
-     (0 '(mwg-doxygen/content-face . (mwg-doxygen/code-face mwg-doxygen/content-face font-lock-doc-face)) chkset nil))
+  '(("\\(?:^[[:space:]]*\\* ?\\)?\\(.+\n?\\|\n\\)"
+     ;;(1 'mwg-doxygen/code-face prepend nil)
+     (1 '(mwg-doxygen/content-face . (mwg-doxygen/code-face mwg-doxygen/content-face font-lock-doc-face)) chkset nil))
     ("\\([\\]\\(?:[a-zA-Z@]+\\|[^*[:space:][:cntrl:]]\\)\\*?\\)\\|\\(%[^\r\n]+\\)\\|\\(\\$[^\\$]+\\$\\)"
      (1 'font-lock-keyword-face prepend t)
      (2 'font-lock-comment-face prepend t)
@@ -394,6 +391,14 @@
   `((,(concat "\\(" mwg-doxygen/rex-NCName "\\(?::" mwg-doxygen/rex-NCName "\\)?\\)\\|\\(\"[^\"]*\"\\|'[^']*'\\)")
      (1 'font-lock-variable-name-face prepend t)
      (2 'font-lock-string-face prepend t))))
+
+(defun mwg-doxygen/select-language-keylist (lang)
+  (cond
+   ((string= lang "cpp")
+    mwg-doxygen/simple-c++-keylist)
+   ((string= lang "tex")
+    mwg-doxygen/tex-keylist)
+   (t nil)))
 
 (defconst mwg-doxygen-font-lock-lwiki-comments
   (let* ((rex_sword "[^[:space:][:cntrl:]]+")
@@ -409,15 +414,10 @@
                                  "def" "enum" "const" "tparam" "struct" "union"
                                  "interface")
                                 "\\)")))
-    `(("^[[:space:]]*\\(?:/[*/]\\?\\(lwiki\\_>\\)\\|\\*[[:space:]]?\\)\\|^\\([[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
-       (1 'mwg-doxygen/content-face prepend t)
-       (1 'mwg-doxygen/keyword-face prepend t)
-       (let ((mend (match-end 2)))
-         (and mend
-              (not (save-excursion (goto-char mend) (looking-at-p "$")))
-              '(1 'mwg-doxygen/content-face prepend t)))
-       (3 'mwg-doxygen/content-face prepend t))
-      ("\\(&[a-zA-Z0-9_]+;?\\)\\|\\(&.\\)" ;; lwiki Entities
+    `(("^[[:space:]]*\\(?:/[*/]\\?\\(lwiki\\_>\\)[[:space:]]*\n?\\|\\*[[:space:]]?\\)\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
+       (1 'mwg-doxygen/lwiki-bold-face prepend t)
+       (2 'mwg-doxygen/content-face prepend t))
+      ("\\(&[a-zA-Z0-9_]+\\*?;?\\)\\|\\(&.\\)" ;; lwiki Entities
        (0 'mwg-doxygen/keyword-face prepend nil))
       ("~~\\|\\[\\[\\|\\]\\]\\|'''?\\|##\\|%%\\|__\\|,,\\|^^\\|==\\|\\\\$"
        (0 '(font-lock-builtin-face mwg-doxygen/lwiki-bold-face) prepend nil))
@@ -515,13 +515,11 @@
       ("\\(<\\?\\([a-zA-Z0-9_]+\\)\\_>\\*?\\)[[:space:]]*\\(.*?\\)\\(\\?>\\)"
        (1 'mwg-doxygen/xml-delim-face prepend nil)
        (4 'mwg-doxygen/xml-delim-face prepend nil)
-       (3 'font-lock-doc-face remove nil) ;; auto-complete
-       (let ((lang (match-string-no-properties 2)))
-         (cond
-          ((string= lang "cpp")
-           '(3 mwg-doxygen/simple-c++-keylist keylist))
-          (t
-           '(3 'mwg-doxygen/code-face prepend nil))))
+       (3 'font-lock-doc-face remove nil) ;; for auto-complete
+       (let* ((lang (match-string-no-properties 2))
+              (klist (mwg-doxygen/select-language-keylist lang)))
+         (if klist `(3 (quote ,klist) keylist)
+           '(3 'mwg-doxygen/code-face prepend nil)))
        (when (= (char-before (match-end 1)) ?*)
          '(3 mwg-doxygen/inline-lwiki-keylist keylist)))
       ;; `...`
@@ -536,9 +534,13 @@
       ;; Code &pre(){ ... }
       (,(concat "&pre\\*?\\(?:(\\([^()]*\\))\\)?[[:space:]]*{[[:space:]]*\n?\\(" rex_braced "?\\)\\(?:^[[:space:]]*\\*[[:space:]]*\\)?}")
        (1 'mwg-doxygen/argument-face prepend t)
-       (and (match-beginning 1)
-            (string-match-p "\\(?:^\\|,\\)[[:space:]]*!cpp[[:space:]]*\\(?:,\\|$\\)" (match-string-no-properties 1))
-            '(2 mwg-doxygen/simple-c++-keylist keylist))
+       (let ((klist (and (match-beginning 1)
+                         (let ((m1 (match-string-no-properties 1)))
+                           (save-match-data
+                             (and (string-match "\\(?:^\\|,\\)[[:space:]]*!\\([a-zA-Z0-9_]+\\)[[:space:]]*\\(?:,\\|$\\)" m1)
+                                  (mwg-doxygen/select-language-keylist (match-string 1 m1))))))))
+         (if klist `(2 (quote ,klist) keylist)
+           '(2 'mwg-doxygen/code-face prepend nil)))
        (when (= (char-after (+ (match-beginning 0) 4)) ?*)
          '(2 mwg-doxygen/inline-lwiki-keylist keylist)))
       ;; TeX &math{}
@@ -719,7 +721,7 @@
         (save-excursion
           (mwg-doxygen/c-font-lock-doc-comments "/[*/]\\?lwiki\\_>" limit
                                                 mwg-doxygen-font-lock-lwiki-comments))
-        (mwg-doxygen/c-font-lock-doc-comments "/\\*[*!]\\|//[/!]" limit
+        (mwg-doxygen/c-font-lock-doc-comments "/\\*\\(?:\\*[^/]\\|!\\)\\|//[/!]" limit
                                               mwg-doxygen-font-lock-doc-comments)))))
 
 ;;*****************************************************************************
@@ -799,16 +801,27 @@ POS is the beginning position of a comment."
                (setq doc-beg (mwg-doxygen/get-forward-beginning-of-doc prefix limit)
                      region-beg doc-beg))
       (let* ((doc-end (mwg-doxygen/get-end-of-doc prefix doc-beg limit))
-             (region-end (min doc-end limit)))
-        ;;(c-put-font-lock-face region-beg region-end c-doc-face-name)
+             (region-end (min limit
+                              (if (and (>= (- doc-end doc-beg) 4)
+                                       (= (char-after doc-beg) ?/)
+                                       (= (char-after (1+ doc-beg)) ?*)
+                                       (= (char-before (1- doc-end)) ?*)
+                                       (= (char-before doc-end) ?/))
+                                  (- doc-end 2)
+                                doc-end))))
+        ;; 範囲 [range-beg range-end]
+        ;;   ドキュメントコメントの探索範囲を示す。
+        ;; 範囲 [doc-beg doc-end]
+        ;;   見付かったドキュメントコメントの範囲を示す。
+        ;;   端点 doc-beg, doc-end は必ずしも [range-beg range-end] の内部にあるとは限らない。
+        ;; 範囲 [region-beg region-end]
+        ;;   ドキュメントコメント内部の着色を行う範囲を示す。
+        ;;   基本的にはドキュメントコメント (/*prefix ... */ や //prefix) の範囲であり、
+        ;;   limit がドキュメントコメントの途中にあればそこで途切れる。
+        ;; (message "mwg-doxygen: range %d-%d region %d-%d" range-beg range-end region-beg region-end)
         (save-restriction
-          (and (> region-end (1+ region-beg))
-               (progn (goto-char region-end)
-                      (backward-char 2)
-                      (looking-at "\\*/"))
-               (setq region-end (point)))
+          ;;(c-put-font-lock-face region-beg region-end c-doc-face-name)
           (narrow-to-region region-beg region-end)
-          ;; (message "mwg-doxygen: range %d-%d region %d-%d" range-beg range-end region-beg region-end)
           (mwg-doxygen/font-lock-apply-keylist region-beg region-end keylist)
           (goto-char region-end)))
       (setq doc-beg nil)))
@@ -829,7 +842,7 @@ REGEXP is the string with a regular expression or function to evaluate.
 * e.g. \"foo|bar\"
 * (lambda (limit) ...)
 
-HIGHLIGHTER has the one of the followings forms:
+HIGHLIGHTER has one of the followings forms:
 * nil
 * match-highlight
     := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
@@ -869,7 +882,7 @@ HIGHLIGHTER has the one of the followings forms:
   "a version of `font-lock-apply-highlight' with 'remove as an override spec.
 font-lock の `font-lock-apply-highlight' を拡張します。引数は以下の形式を取ります。
 
-  `HIGHLIGHT' := (group face override ignore-nomatch)
+  HIGHLIGHT := (group face override ignore-nomatch)
 
 - group = (nth 0 highlight)
   適用先のマッチグループ番号を指定します。
