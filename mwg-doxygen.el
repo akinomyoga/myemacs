@@ -173,12 +173,12 @@
 ;;          (rex_br5 (concat "{\\(?:[^{}]\\|" rex_br4 "\\)*}")))
 ;;     rex_br5))
 
+(defconst mwg-doxygen/doc:doxygen/rex-line-head
+  "\\(?:^[[:space:]]*\\(?:/\\*[*!]<?\\|//[/!]<?\\|\\*\\)[[:space:]]?\\)")
+
 (defconst mwg-doxygen-font-lock-doc-comments
   (let ((rex_sword "[^[:space:][:cntrl:]]+"))
-    `(
-      ;; ("^\\(?:/\\*[*!]<?\\|//[/!]<?\\|[[:space:]*]+\\)[[:space:]]*\\|\\(.+\\)$" ;; content
-      ;;  1 'mwg-doxygen/content-face prepend t)
-      ("^[[:space:]]*\\(?:/\\*[*!]<?\\|//[/!]<?\\|\\*\\)[[:space:]]?\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
+    `((,(concat mwg-doxygen/doc:doxygen/rex-line-head "\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)") ;; content
        (1 'mwg-doxygen/content-face prepend t))
       (,(let* ((rex_id "\\(?:\\_<.\\)\\(?:\\sw\\|_\\)*")
                ;;(rex_id "\\(?:\\_<\\sw\\|\\B_\\|^_\\)\\(?:\\sw\\|_\\)*")
@@ -237,7 +237,7 @@
       (,(concat "\\(</?\\)\\(" mwg-doxygen/rex-NCName "\\(?::" mwg-doxygen/rex-NCName "\\)?\\)\\(\\(?:\\sw\\|\\s \\|[_=\n\r*.:]\\|\"[^\"]*\"\\|'[^']*'\\)*\\)\\(/?>\\)")
        (1 'mwg-doxygen/xml-delim-face prepend nil)
        (2 'mwg-doxygen/xml-name-face prepend nil)
-       (3 mwg-doxygen/xml-keylist keylist)
+       (3 mwg-doxygen/doc:doxygen/xmltag-keylist keylist)
        (4 'mwg-doxygen/xml-delim-face prepend nil))
       (,(concat
          "\\([\\@]\\(?:"
@@ -350,8 +350,8 @@
       ("[\\@]f\\$\\(\\(?:[^\\@]\\|[\\@]\\(?:[^f]\\|f[^$]\\)\\)+\\)\\(?:[\\@]f\\$\\)?\\|[\\@]f\\[\\(\\(?:[^\\@]\\|[\\@]\\(?:[^f]\\|f[^]]\\)\\)+\\)\\(?:[\\@]f\\]\\)?"
        ;; 2015-02-01
        ;;   /[\\@]f\$((?:(?![\\@]f\$).)+)(?:[\\@]f\$)?|[\\@]f\[((?:(?![\\@]f\]).)+)(?:[\\@]f\])?/
-       (1 mwg-doxygen/tex-keylist keylist t)
-       (2 mwg-doxygen/tex-keylist keylist t))
+       (1 mwg-doxygen/simple-tex-keylist keylist t)
+       (2 mwg-doxygen/simple-tex-keylist keylist t))
       ;; TeX \f{env}{ ... }
       ("[\\@]f{\\([[:alnum:][:space:]@*]+\\)}\\s *{\\(\\(?:[^\\@]\\|[\\@]\\(?:[^f]\\|f[^}]\\)\\)+\\)\\(?:[\\@]f}\\)?"
        ;; 2015-02-01
@@ -361,7 +361,7 @@
        ;;   上の正規表現は ES でいう /[\\@]f\{([\w\s@*]+)\}\s*\{((?:(?![\\@]f\}).)+)(?:[\\@]f\})?/ に等価
        ;;   (emacs regex には forward_negation が存在しないので分かりにくい指定になっている)。
        (1 'mwg-doxygen/code-face prepend nil)
-       (2 mwg-doxygen/tex-keylist keylist))
+       (2 mwg-doxygen/simple-tex-keylist keylist))
       (,(concat
          "&\\(?:"
          (mwg/rex-or
@@ -377,28 +377,13 @@
       ;;  0 'mwg-doxygen/keyword-face prepend nil)
       )))
 
-(defconst mwg-doxygen/tex-keylist
-  '(("\\(?:^[[:space:]]*\\* ?\\)?\\(.+\n?\\|\n\\)"
-     ;;(1 'mwg-doxygen/code-face prepend nil)
-     (1 '(mwg-doxygen/content-face . (mwg-doxygen/code-face mwg-doxygen/content-face font-lock-doc-face)) chkset nil))
-    ("\\([\\]\\(?:[a-zA-Z@]+\\|[^*[:space:][:cntrl:]]\\)\\*?\\)\\|\\(%[^\r\n]+\\)\\|\\(\\$[^\\$]+\\$\\)"
-     (1 'font-lock-keyword-face prepend t)
-     (2 'font-lock-comment-face prepend t)
-     (3 'font-lock-string-face prepend t))
-    ("[{}_^&~]"
-     (0 'font-lock-builtin-face prepend t))))
-(defconst mwg-doxygen/xml-keylist
+(defconst mwg-doxygen/doc:doxygen/xmltag-keylist
   `((,(concat "\\(" mwg-doxygen/rex-NCName "\\(?::" mwg-doxygen/rex-NCName "\\)?\\)\\|\\(\"[^\"]*\"\\|'[^']*'\\)")
      (1 'font-lock-variable-name-face prepend t)
      (2 'font-lock-string-face prepend t))))
 
-(defun mwg-doxygen/select-language-keylist (lang)
-  (cond
-   ((string= lang "cpp")
-    mwg-doxygen/simple-c++-keylist)
-   ((string= lang "tex")
-    mwg-doxygen/tex-keylist)
-   (t nil)))
+(defconst mwg-doxygen/doc:lwiki/rex-line-head
+  "\\(?:^[[:space:]]*\\(?:\\(?:/[/*]\\)\\?lwiki\\_>\\|\\*\\)[[:space:]]?\\)")
 
 (defconst mwg-doxygen-font-lock-lwiki-comments
   (let* ((rex_sword "[^[:space:][:cntrl:]]+")
@@ -414,14 +399,17 @@
                                  "def" "enum" "const" "tparam" "struct" "union"
                                  "interface")
                                 "\\)")))
-    `(("^[[:space:]]*\\(?:/[*/]\\?\\(lwiki\\_>\\)[[:space:]]*\n?\\|\\*[[:space:]]?\\)\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
+    `(("^[[:space:]]*\\(?:/[*/]\\?\\(lwiki\\_>\\)\\(?:[[:space:]]*\n\\|[[:space:]]\\)\\|\\*[[:space:]]?\\)\\|^\\(?:[[:space:]]+\\)\\'\\|\\(.*\n\\|.+$\\)" ;; content
        (1 'mwg-doxygen/lwiki-bold-face prepend t)
        (2 'mwg-doxygen/content-face prepend t))
-      ("\\(&[a-zA-Z0-9_]+\\*?;?\\)\\|\\(&.\\)" ;; lwiki Entities
+      ;; lwiki Entities
+      ("\\(&[a-zA-Z0-9_]+\\*?;?\\)\\|\\(&.\\)"
        (0 'mwg-doxygen/keyword-face prepend nil))
+      ;; lwiki markups
       ("~~\\|\\[\\[\\|\\]\\]\\|'''?\\|##\\|%%\\|__\\|,,\\|^^\\|==\\|\\\\$"
        (0 '(font-lock-builtin-face mwg-doxygen/lwiki-bold-face) prepend nil))
-      (,(concat ;; doxygen like commands
+      ;; doxygen like commands
+      (,(concat
          "\\(@\\(?:"
          (mwg/rex-or
           ;; \cmd ... (後で詳細な文法に従って色付けされるコマンド)
@@ -508,9 +496,9 @@
        (1 'mwg-doxygen/warning-face remove nil)
        (1 'mwg-doxygen/keyword-face prepend nil)
        (2 'mwg-doxygen/file-face prepend nil))
-      ("^\\(?:/\\*[*!]<?\\|//[/!]<?\\)?\\(?:\\s \\|[*]\\)*\\([-+:]+\\|> \\)" ;; - ul, + ol, : dl
-       (1 'mwg-doxygen/item-face prepend t)
-       (2 'mwg-doxygen/item-face prepend t))
+      ;; lwiki list items
+      (,(concat "^" mwg-doxygen/doc:lwiki/rex-line-head "?\\([-+:]+\\|> \\)") ;; - ul, + ol, : dl
+       (1 'mwg-doxygen/item-face prepend t))
       ;; <?lang ...?>
       ("\\(<\\?\\([a-zA-Z0-9_]+\\)\\_>\\*?\\)[[:space:]]*\\(.*?\\)\\(\\?>\\)"
        (1 'mwg-doxygen/xml-delim-face prepend nil)
@@ -545,17 +533,35 @@
          '(2 mwg-doxygen/inline-lwiki-keylist keylist)))
       ;; TeX &math{}
       (,(concat "&math{\\(" rex_braced "\\)}")
-       (1 mwg-doxygen/tex-keylist keylist))
+       (1 mwg-doxygen/simple-tex-keylist keylist))
       ;; TeX $...$
       ("\\(\\$\\)\\([^$]+\\)\\(\\$\\)"
        (1 'mwg-doxygen/keyword-face prepend nil)
        (3 'mwg-doxygen/keyword-face prepend nil)
-       (2 mwg-doxygen/tex-keylist keylist))
+       (2 mwg-doxygen/simple-tex-keylist keylist))
       ;; TeX &begin(){ ... }
       (,(concat "&begin(\\([[:alnum:][:space:]@*]+\\))\\s *{\\(" rex_braced "\\)}?")
        (1 'mwg-doxygen/argument-face prepend nil)
-       (2 mwg-doxygen/tex-keylist keylist))
+       (2 mwg-doxygen/simple-tex-keylist keylist))
       )))
+
+(defun mwg-doxygen/select-language-keylist (lang)
+  (cond
+   ((string= lang "cpp")
+    mwg-doxygen/simple-c++-keylist)
+   ((string= lang "tex")
+    mwg-doxygen/simple-tex-keylist)
+   (t nil)))
+
+(defconst mwg-doxygen/simple-tex-keylist
+  '(((concat mwg-doxygen/local:document-line-head "\\|\\(.+\n?\\|\n\\)")
+     (1 'mwg-doxygen/code-face prepend t))
+    ("\\([\\]\\(?:[a-zA-Z@]+\\|[^*[:space:][:cntrl:]]\\)\\*?\\)\\|\\(%[^\r\n]+\\)\\|\\(\\$[^\\$]+\\$\\)"
+     (1 'font-lock-keyword-face prepend t)
+     (2 'font-lock-comment-face prepend t)
+     (3 'font-lock-string-face prepend t))
+    ("[{}_^&~]"
+     (0 'font-lock-builtin-face prepend t))))
 
 (defconst mwg-doxygen/inline-lwiki-keylist
   `((,(concat "\\(==\\)\\(\\(?:" mwg-doxygen/rex-csym "\\|[[:space:]]\\)+\\)\\(==\\)")
@@ -649,21 +655,23 @@
           "\\)"))
         (rex-csymf mwg-doxygen/rex-csymf)
         (rex-csym  mwg-doxygen/rex-csym))
-    `(("\\(?:^[[:space:]]*\\* ?\\)?\\(.+\n?\\|\n\\)"
-       ;;(1 '(mwg-doxygen/content-face . (mwg-doxygen/code-face mwg-doxygen/content-face)) chkset nil)
-       (1 'mwg-doxygen/code-face prepend nil))
-      (,(concat
-         ;; Comments
-         "\\(//.*\\(?:\n\\|$\\)?\\|/\\*\\(?:[^*/]+\\|[*][^/]\\|[*]\\'\\)*\\(?:\\*/\\)?\\)"
-         ;; String Literals
-         "\\|\\(" mwg-doxygen/rex-string-literal "\\)"
-         ;; Number Literals
-         "\\|\\(\\_<0[xX][0-9-a-fA-F]+\\_>\\|\\(?:\\_<\\|\\.\\)[0-9]\\(?:[.0-9]\\|[eE][-+]?\\)*[_a-zA-Z0-9]*\\)"
-         ;; Composite Keywords
-         "\\|\\(\\_<" rex-composite-keywords "\\_>\\)"
-         ;; Identifiers
-         "\\|\\(\\_<" rex-csymf rex-csym "*\\_>\\)"
-         )
+    `(((concat mwg-doxygen/local:document-line-head "\\|\\(.+\n?\\|\n\\)")
+       (1 'mwg-doxygen/code-face prepend t))
+      ((concat
+        ;; skip lwiki Line Head
+        mwg-doxygen/local:document-line-head
+        ,(concat
+          ;; Comments
+          "\\|\\(//.*\\(?:\n\\|$\\)?\\|/\\*\\(?:[^*/]+\\|[*][^/]\\|[*]\\'\\)*\\(?:\\*/\\)?\\)"
+          ;; String Literals
+          "\\|\\(" mwg-doxygen/rex-string-literal "\\)"
+          ;; Number Literals
+          "\\|\\(\\_<0[xX][0-9-a-fA-F]+\\_>\\|\\(?:\\_<\\|\\.\\)[0-9]\\(?:[.0-9]\\|[eE][-+]?\\)*[_a-zA-Z0-9]*\\)"
+          ;; Composite Keywords
+          "\\|\\(\\_<" rex-composite-keywords "\\_>\\)"
+          ;; Identifiers
+          "\\|\\(\\_<" rex-csymf rex-csym "*\\_>\\)"
+          ))
        (1 'font-lock-comment-face prepend t)
        (2 'font-lock-string-face prepend t)
        (4 'font-lock-keyword-face prepend t)
@@ -689,10 +697,10 @@
                      (looking-at-p ,(concat "\\(?:[[:space:]]+[*&]*\\|[*&]+[[:space:]]+\\)\\_<\\|[*&]+[[:space:]]*\\(?:[]),/:;<>?`|}]\\|$\\)"))
                      (progn (goto-char beg) nil)
                      (looking-back "\\_<\\(?:struct\\|class\\|typename\\|new\\)[[:space:]]+"
-                                   mwg-doxygen/apply-keylist-beg)
-                     (and (looking-back "\\_<\\(?:const\\|volatile\\)[[:space:]]+" mwg-doxygen/apply-keylist-beg)
+                                   mwg-doxygen/local:apply-keylist-beg)
+                     (and (looking-back "\\_<\\(?:const\\|volatile\\)[[:space:]]+" mwg-doxygen/local:apply-keylist-beg)
                           (string-match-p "\\(?:^\\|[!#-&(+-/:-=?@[\\^`{-~]\\)[[:cntrl:][:space:]]*\\_<\\(?:const\\|volatile\\)[[:space:]]+$"
-                                          (buffer-substring-no-properties mwg-doxygen/apply-keylist-beg beg))))
+                                          (buffer-substring-no-properties mwg-doxygen/local:apply-keylist-beg beg))))
                  '(5 'font-lock-type-face prepend t))
                 ;; function name
                 ((progn (goto-char end)
@@ -705,7 +713,7 @@
                 ;; variable decl
                 ((or (progn (goto-char beg) nil)
                      (looking-back ,(concat "\\_>\\(?:[[:space:]]+[*&]*\\|[*&]+[[:space:]]+\\)\\|>[*&]+[[:space:]]+\\|\\(?:[^>[:space:]]\\|[>\n][[:space:]]+>?\\)>[[:space:]]+[*&]*")
-                                   mwg-doxygen/apply-keylist-beg))
+                                   mwg-doxygen/local:apply-keylist-beg))
                  '(5 'font-lock-variable-name-face prepend t))
                 ;; guess types?
                 ((string-match-p ,(concat "^.+_t$\\|^.+_type$\\|^\\(?:type\\|\\(?:const_\\)?iterator\\|[A-Z][0-9]?\\)$") identifier)
@@ -719,10 +727,12 @@
 (defun mwg-doxygen-font-lock-keywords ()
   `((,(lambda (limit)
         (save-excursion
-          (mwg-doxygen/c-font-lock-doc-comments "/[*/]\\?lwiki\\_>" limit
-                                                mwg-doxygen-font-lock-lwiki-comments))
-        (mwg-doxygen/c-font-lock-doc-comments "/\\*\\(?:\\*[^/]\\|!\\)\\|//[/!]" limit
-                                              mwg-doxygen-font-lock-doc-comments)))))
+          (let ((mwg-doxygen/local:document-line-head mwg-doxygen/doc:lwiki/rex-line-head))
+            (mwg-doxygen/c-font-lock-doc-comments "/[*/]\\?lwiki\\_>" limit
+                                                  mwg-doxygen-font-lock-lwiki-comments)))
+        (let ((mwg-doxygen/local:document-line-head mwg-doxygen/doc:doxygen/rex-line-head))
+          (mwg-doxygen/c-font-lock-doc-comments "/\\*\\(?:\\*[^/]\\|!\\)\\|//[/!]" limit
+                                                mwg-doxygen-font-lock-doc-comments))))))
 
 ;;*****************************************************************************
 ;;  Modification of library functions
@@ -830,20 +840,33 @@ POS is the beginning position of a comment."
 ;; font-lock functions
 (defun mwg-doxygen/font-lock-apply-keylist (begin end keylist)
   (while keylist
-    (let ((mwg-doxygen/apply-keylist-beg begin) ;; keylist 内部から参照する為の変数
-          (mwg-doxygen/apply-keylist-end end)   ;; 同上
+    (let ((mwg-doxygen/local:apply-keylist-beg begin) ;; keylist 内部から参照する為の変数
+          (mwg-doxygen/local:apply-keylist-end end)   ;; 同上
           (kwdpair (car keylist)))
       (goto-char begin)
       (mwg-doxygen/font-lock-apply-keyword (car kwdpair) (cdr kwdpair) end))
     (setq keylist (cdr keylist))))
 (defun mwg-doxygen/font-lock-apply-keyword (regexp highlighter limit)
   "
-REGEXP is the string with a regular expression or function to evaluate.
-* e.g. \"foo|bar\"
-* (lambda (limit) ...)
+REGEXP には適用対象を指定します。
+
+* REGEXP を eval した結果が文字列の場合はその文字列を正規表現として検索を行います。
+  検索が一致した場合に一致範囲に HIGHLIGHTER を適用します。
+* REGEXP を eval した結果が文字列ではない場合は、更にそれを関数として呼び出します。
+  関数は第一引数に LIMIT を受け取ります。関数内では正規表現による一致を試行し match-data を設定します。
+  関数は、適用対象が見付からなかった場合は nil を返し、それ以外の場合は nil 以外の値を返します。
+  関数が nil 以外を返した時に HIGHLIGHTER を適用します。
+
+例:
+
+  REGEXP = \"foo\\\\|bar\"
+
+  REGEXP = (concat var1 \"\\\\|bar\")
+
+  REGEXP = '(lambda (limit) ...内部でmatch-dataを設定しnil以外を返す または nilを返す...)
 
 HIGHLIGHTER has one of the followings forms:
-* nil
+
 * match-highlight
     := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
   Applies font face to the range with specified match index.
@@ -852,32 +875,35 @@ HIGHLIGHTER has one of the followings forms:
     := (<match-highlight> <match-highlight> ... <match-highlight>)
   Applies font face to the multiple ranges with specified match indices.
 * program := e.g. ((progn ...))
-  This S-expression can return a list of match-highlights. This is an extension."
-  (while (if (stringp regexp)
-             (re-search-forward regexp limit t)
-           (funcall regexp limit))
-    ;; 2015-02-01内部で (point) を移動すると同じ箇所に二重に適用したりするので save-excursion で囲む
-    (save-excursion
-      (let* ((highlighter highlighter)
-             (head (car highlighter)))
-        (if (not (consp head))
-            ;; highlighter = (0 'hoge-face foo bar)
-            (mwg-doxygen/font-lock-apply-highlight highlighter)
-          (while highlighter
-            (let ((head (car highlighter)) rules)
-              (cond
-               ((integerp (car head))
-                ;; highlighter = ((0 'face foo bar) (1 'face foo bar) ...)
-                (mwg-doxygen/font-lock-apply-highlight head))
-               ((symbolp (car head))
-                ;; highlighter = ((progn ...))
-                (when (setq rules (eval head))
-                  (if (consp (car rules))
-                      (while rules
-                        (mwg-doxygen/font-lock-apply-highlight (car rules))
-                        (setq rules (cdr rules)))
-                    (mwg-doxygen/font-lock-apply-highlight rules))))))
-            (setq highlighter (cdr highlighter))))))))
+  This S-expression can return a list of match-highlights. This is an extension.
+* nil"
+  (let ((matcher (eval regexp)))
+    (while (if (stringp matcher)
+               (re-search-forward matcher limit t)
+             (funcall matcher limit))
+      ;; 2015-02-01内部で (point) を移動すると同じ箇所に二重に適用したりするので save-excursion で囲む
+      (save-excursion
+        (let* ((highlighter highlighter)
+               (head (car highlighter)))
+          (if (not (consp head))
+              ;; highlighter = (0 'hoge-face foo bar)
+              (mwg-doxygen/font-lock-apply-highlight highlighter)
+            (while highlighter
+              (let ((head (car highlighter)) rules)
+                (cond
+                 ((integerp (car head))
+                  ;; highlighter = ((0 'face foo bar) (1 'face foo bar) ...)
+                  (mwg-doxygen/font-lock-apply-highlight head))
+                 ((symbolp (car head))
+                  ;; highlighter = ((progn ...))
+                  (when (setq rules (eval head))
+                    (if (consp (car rules))
+                        (while rules
+                          (mwg-doxygen/font-lock-apply-highlight (car rules))
+                          (setq rules (cdr rules)))
+                      (mwg-doxygen/font-lock-apply-highlight rules))))))
+              (setq highlighter (cdr highlighter)))))))))
+
 (defun mwg-doxygen/font-lock-apply-highlight (highlight)
   "a version of `font-lock-apply-highlight' with 'remove as an override spec.
 font-lock の `font-lock-apply-highlight' を拡張します。引数は以下の形式を取ります。
