@@ -422,16 +422,43 @@
      (3 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))
     (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(?:x\\|expand\\)[[:space:]]+\\([[:alnum:]_:]+\\)\\(.+\\)?")
      (1 'mwg-doxygen/mwgpp-macro-name prepend nil)
-     (2 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))))
+     (2 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(?:[)]\\|end\\)\\(.+\\)?")
+     (1 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))))
 (defconst mwg-doxygen/doc:mwgpp/modifiers-keylist
-  `((,(concat "\\.\\([rR]\\)\\(.\\)\\(\\(?:[^\\]\\|\\\\.\\)*?\\)\\(\\2\\)\\(\\(?:[^\\]\\|\\\\.\\)*?\\)\\(\\2\\)\\|\\.\\(i\\)")
-     (1 'font-lock-function-name-face prepend t)
-     (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
-     (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
-     (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
-     (5 mwg-doxygen/doc:mwgpp/replacement-keylist keylist t)
-     (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
-     (7 'font-lock-function-name-face prepend t))))
+  (let ((seq "\\(?:[^\\]\\|\\\\.\\)*?"))
+    `((,(concat
+       "[[:space:]]+"
+       "\\|\\.[rR]\\(.\\)" seq "\\1" seq "\\1"
+       "\\|\\.f\\(.\\)" seq "\\2" seq "\\2" seq "\\2"
+       "\\|\\.\\(i\\)"
+       "\\|\\(.+\\)")
+       (cond
+        ((match-beginning 1)
+         (goto-char (match-beginning 0))
+         (if (looking-at ,(concat "\\.\\([rR]\\)\\(.\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)"))
+             nil (message "rR match failed at %d" (match-beginning 1)))
+         '((1 'font-lock-function-name-face prepend t)
+           (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
+           (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (5 mwg-doxygen/doc:mwgpp/replacement-keylist keylist t)
+           (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)))
+        ((match-beginning 2)
+         (goto-char (match-beginning 0))
+         (looking-at ,(concat "\\.\\([f]\\)\\(.\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)"))
+         '((1 'font-lock-function-name-face prepend t)
+           (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
+           (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (5 mwg-doxygen/simple-c++-keylist keylist t)
+           (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (7 mwg-doxygen/simple-c++-keylist keylist t)
+           (8 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)))
+        (t
+         '((3 'font-lock-function-name-face prepend t)
+           (4 'font-lock-warning-face prepend t)))))
+      )))
 
 (defconst mwg-doxygen/doc:mwgpp/regexp-keylist
   (let* ((rex-atomic "(\\(?:\\?[!=:]\\)?\\|[)|^$]")
@@ -1015,44 +1042,52 @@ REGEXP には適用対象を指定します。
 
   REGEXP = '(lambda (limit) ...内部でmatch-dataを設定しnil以外を返す または nilを返す...)
 
-HIGHLIGHTER has one of the followings forms:
-
-* match-highlight
-    := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
-  Applies font face to the range with specified match index.
-  It is the argument for the `font-lock-apply-highlight'.
-* list of match-highlights
-    := (<match-highlight> <match-highlight> ... <match-highlight>)
-  Applies font face to the multiple ranges with specified match indices.
-* program := e.g. ((progn ...))
-  This S-expression can return a list of match-highlights. This is an extension.
-* nil"
+REGEXP が一致した時、HIGHLIGHTER が `mwg-doxygen/font-lock-apply-recursive-highlight' によって適用されます。
+HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight' の説明を参照して下さい。"
   (let ((matcher (eval regexp)))
     (while (if (stringp matcher)
                (re-search-forward matcher limit t)
              (funcall matcher limit))
       ;; 2015-02-01内部で (point) を移動すると同じ箇所に二重に適用したりするので save-excursion で囲む
       (save-excursion
-        (let* ((highlighter highlighter)
-               (head (car highlighter)))
-          (if (not (consp head))
-              ;; highlighter = (0 'hoge-face foo bar)
-              (mwg-doxygen/font-lock-apply-highlight highlighter)
-            (while highlighter
-              (let ((head (car highlighter)) rules)
-                (cond
-                 ((integerp (car head))
-                  ;; highlighter = ((0 'face foo bar) (1 'face foo bar) ...)
-                  (mwg-doxygen/font-lock-apply-highlight head))
-                 ((symbolp (car head))
-                  ;; highlighter = ((progn ...))
-                  (when (setq rules (eval head))
-                    (if (consp (car rules))
-                        (while rules
-                          (mwg-doxygen/font-lock-apply-highlight (car rules))
-                          (setq rules (cdr rules)))
-                      (mwg-doxygen/font-lock-apply-highlight rules))))))
-              (setq highlighter (cdr highlighter)))))))))
+        (mwg-doxygen/font-lock-apply-recursive-highlight highlighter)))))
+
+(defun mwg-doxygen/font-lock-apply-recursive-highlight (highlighter)
+"HIGHLIGHTER has one of the followings forms:
+
+* HIGHLIGHTER := <highliter>
+
+* <highlighter> := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
+  If the first element is an integer, <highlighter> is treated as this quartet form.
+  Applies font face to the range with specified match index.
+  It is the argument for the `font-lock-apply-highlight'.
+
+* <highlighter> := (progn ...)
+  If the first element is a symbol, <highlighter> is treated as a program.
+  This S-expression can return a <highlighter> object which will be recursively processed.
+
+* <highlighter> := (<highlighter> <highlighter> ... <highlighter>)
+  Each sub highlighter is applied in order.
+
+* nil
+  Nothing applied."
+  (if (consp highlighter)
+      (let ((head (car highlighter))
+            (tail (cdr highlighter)))
+        (cond
+         ((integerp head)
+          (mwg-doxygen/font-lock-apply-highlight highlighter))
+         ((symbolp head)
+          (mwg-doxygen/font-lock-apply-recursive-highlight (eval highlighter)))
+         ((or (not tail) (consp tail))
+          (while head
+            (mwg-doxygen/font-lock-apply-recursive-highlight head)
+            (setq head (car tail)
+                  tail (cdr tail))))
+         (t
+          (error "invalid format of highlighter: %S" highlighter))))
+    (if highlighter
+        (error "invalid format of highlighter: %S" highlighter))))
 
 (defun mwg-doxygen/font-lock-apply-highlight (highlight)
   "a version of `font-lock-apply-highlight' with 'remove as an override spec.
