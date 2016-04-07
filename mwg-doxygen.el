@@ -412,7 +412,7 @@
      (2 'mwg-doxygen/mwgpp-face prepend t))
     (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(\\[\\)\\(.*\\)\\(\\]\\)$")
      (1 '(mwg-doxygen/mwgpp-directive-name bold) prepend nil)
-     (2 mwg-doxygen/simple-c++-keylist keylist)
+     (2 mwg-doxygen/simple-arithmetic-keylist keylist)
      (3 '(mwg-doxygen/mwgpp-directive-name mwg-doxygen/lwiki-bold-face) prepend nil))
     (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\([[:alpha:]_][[:alnum:]_]*\\|[<>$]\\)")
      (1 'mwg-doxygen/mwgpp-directive-name prepend nil))
@@ -451,9 +451,9 @@
            (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
            (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
            (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
-           (5 mwg-doxygen/simple-c++-keylist keylist t)
+           (5 mwg-doxygen/simple-arithmetic-keylist keylist t)
            (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
-           (7 mwg-doxygen/simple-c++-keylist keylist t)
+           (7 mwg-doxygen/simple-arithmetic-keylist keylist t)
            (8 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)))
         (t
          '((3 'font-lock-function-name-face prepend t)
@@ -627,6 +627,9 @@
        (1 'mwg-doxygen/keyword-face prepend nil)
        (2 'mwg-doxygen/file-face prepend nil))
       ;; lwiki list items
+      (,(concat "^" mwg-doxygen/doc:lwiki/rex-line-head "[[:space:]]\\([*]+.*\\)") ;; *見出し
+       (1 'mwg-doxygen/title-face prepend t))
+      ;; lwiki list items
       (,(concat "^" mwg-doxygen/doc:lwiki/rex-line-head "?\\([-+:]+\\|> \\)") ;; - ul, + ol, : dl
        (1 'mwg-doxygen/item-face prepend t))
       ;; <?lang ...?>
@@ -700,6 +703,35 @@
      (2 'mwg-doxygen/lwiki-bold-face prepend nil))
     ("~~\\|\\[\\[\\|\\]\\]\\|'''?\\|##\\|%%\\|__\\|,,\\|^^\\|==\\|\\\\$"
      (0 'font-lock-builtin-face prepend nil))))
+(defconst mwg-doxygen/simple-arithmetic-keylist
+  `(((concat mwg-doxygen/local:document-line-head "\\|\\(.+\n?\\|\n\\)")
+     (1 'mwg-doxygen/code-face prepend t))
+    ((concat
+      ;; skip lwiki Line Head
+      mwg-doxygen/local:document-line-head
+      ,(concat
+        ;; String Literals
+        "\\|\\(" mwg-doxygen/rex:c++-string-literal "\\)"
+        ;; Number Literals
+        "\\|\\(\\_<0[xX][0-9-a-fA-F]+\\_>\\|\\(?:\\_<\\|\\.\\)[0-9]\\(?:[.0-9]\\|[eE][-+]?\\)*[_a-zA-Z0-9]*\\)"
+        ;; Identifiers
+        "\\|\\(\\_<" mwg-doxygen/rex-csymf mwg-doxygen/rex-csym "*\\_>\\)"
+        ))
+     (1 'font-lock-string-face prepend t)
+     (when (match-beginning 3)
+         (let ((beg (match-beginning 3))
+               (end (match-end 3)))
+           (save-excursion
+             (cond
+              ;; function name
+              ((progn (goto-char end)
+                      (looking-at-p ,(concat "[[:space:]]*(")))
+               '(3 'font-lock-function-name-face prepend nil))
+              ;; other name
+              (t
+               '(3 'font-lock-variable-name-face prepend nil))
+              )))))
+    ))
 (defconst mwg-doxygen/simple-c++-keylist
   (let ((rex-composite-keywords
          (concat "\\(?:"
@@ -787,10 +819,13 @@
         (rex-csym  mwg-doxygen/rex-csym))
     `(((concat mwg-doxygen/local:document-line-head "\\|\\(.+\n?\\|\n\\)")
        (1 'mwg-doxygen/code-face prepend t))
-      ((concat
-        ;; skip lwiki Line Head
-        mwg-doxygen/local:document-line-head
+      ((replace-regexp-in-string
+        "@\\^" mwg-doxygen/local:document-line-head
         ,(concat
+          ;; Preprocessor directives
+          "@^[[:space:]]*\\(#[[:space:]]*[[:alpha:]_][[:alnum:]_]+\\_>\\)"
+          ;; skip lwiki Line Head
+          "\\|@^"
           ;; Comments
           "\\|\\(//.*\\(?:\n\\|$\\)?\\|/\\*\\(?:[^*/]+\\|[*][^/]\\|[*]\\'\\)*\\(?:\\*/\\)?\\)"
           ;; String Literals
@@ -801,27 +836,28 @@
           "\\|\\(\\_<" rex-composite-keywords "\\_>\\)"
           ;; Identifiers
           "\\|\\(\\_<" rex-csymf rex-csym "*\\_>\\)"
-          ))
-       (1 'font-lock-comment-face prepend t)
-       (2 'font-lock-string-face prepend t)
-       (4 'font-lock-keyword-face prepend t)
-       (when (match-beginning 5)
-         (let ((beg (match-beginning 5))
-               (end (match-end 5))
-               (identifier (match-string-no-properties 5)))
+          ) t t)
+       (1 'font-lock-preprocessor-face prepend t)
+       (2 'font-lock-comment-face prepend t)
+       (3 'font-lock-string-face prepend t)
+       (5 'font-lock-keyword-face prepend t)
+       (when (match-beginning 6)
+         (let ((beg (match-beginning 6))
+               (end (match-end 6))
+               (identifier (match-string-no-properties 6)))
            (save-match-data
              (save-excursion
                (cond
                 ;; C++ builtin-types
                 ((string-match-p ,(concat "^" rex-builtin-types "$") identifier)
-                 '(5 'font-lock-type-face prepend t))
+                 '(6 'font-lock-type-face prepend t))
                 ;; C++ keywords
                 ((string-match-p ,(concat "^" rex-keyword "$") identifier)
-                 '(5 'font-lock-keyword-face prepend t))
+                 '(6 'font-lock-keyword-face prepend t))
                 ;; namespace
                 ((progn (goto-char end)
                         (looking-at-p "[[:space:]]*::"))
-                 '(5 'font-lock-constant-face prepend t))
+                 '(6 'font-lock-constant-face prepend t))
                 ;; typenames
                 ((or (progn (goto-char end) nil)
                      (looking-at-p ,(concat "\\(?:[[:space:]]+[*&]*\\|[*&]+[[:space:]]+\\)\\_<\\|[*&]+[[:space:]]*\\(?:[]),/:;<>?`|}]\\|$\\)"))
@@ -831,25 +867,25 @@
                      (and (looking-back "\\_<\\(?:const\\|volatile\\)[[:space:]]+" mwg-doxygen/local:apply-keylist-beg)
                           (string-match-p "\\(?:^\\|[!#-&(+-/:-=?@[\\^`{-~]\\)[[:cntrl:][:space:]]*\\_<\\(?:const\\|volatile\\)[[:space:]]+$"
                                           (buffer-substring-no-properties mwg-doxygen/local:apply-keylist-beg beg))))
-                 '(5 'font-lock-type-face prepend t))
+                 '(6 'font-lock-type-face prepend t))
                 ;; function name
                 ((progn (goto-char end)
                         (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)?(")))
-                 '(5 'font-lock-function-name-face prepend t))
+                 '(6 'font-lock-function-name-face prepend t))
                 ;; template name
                 ((progn (goto-char end)
                         (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)")))
-                 '(5 'font-lock-type-face prepend t))
+                 '(6 'font-lock-type-face prepend t))
                 ;; variable decl
                 ((or (progn (goto-char beg) nil)
                      (looking-back ,(concat "\\_>\\(?:[[:space:]]+[*&]*\\|[*&]+[[:space:]]+\\)\\|>[*&]+[[:space:]]+\\|\\(?:[^>[:space:]]\\|[>\n][[:space:]]+>?\\)>[[:space:]]+[*&]*")
                                    mwg-doxygen/local:apply-keylist-beg))
-                 '(5 'font-lock-variable-name-face prepend t))
+                 '(6 'font-lock-variable-name-face prepend t))
                 ;; guess types?
                 ((string-match-p ,(concat "^.+_t$\\|^.+_type$\\|^\\(?:type\\|\\(?:const_\\)?iterator\\|[A-Z][0-9]?\\)$") identifier)
-                 '(5 'font-lock-type-face prepend t))
+                 '(6 'font-lock-type-face prepend t))
                 ;; (t
-                ;;  '(5 'font-lock-function-name-face prepend t))
+                ;;  '(6 'font-lock-function-name-face prepend t))
                 ))))))
       )))
 
