@@ -1,8 +1,24 @@
 
 
+
+2016-04-04
+
+* mwgpp //% の対応
+
 -------------------------------------------------------------------------------
   Done
 -------------------------------------------------------------------------------
+
+2016-04-04
+
+* コミット e7c9fdd のメッセージ設定に失敗していた。本来のメッセージは以下の通り:
+
+  | mwg-doxygen.el: Improve the range determination of document comments; organize codes.
+  |
+  | mwg-doxygen.el: 埋め込み言語判定部分を分離。&pre() 及び <? ... ?> で再利用。
+  | mwg-doxygen.el: \bugfix, Fixed a bug that */' in/// comments */' at the end of the buffer was not considered to be a part of the document comment contents.
+  | mwg-doxygen.el (mwg-doxygen-font-lock-{doc,lwiki}-comments): ドキュメント背景色に関する無駄なコードを削除。
+  | mwg-doxygen.el: empty comments `/**/' are not treated as document comments.
 
 2016-04-03
 

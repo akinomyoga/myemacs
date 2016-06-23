@@ -24,6 +24,9 @@
 ;; Provided interactive functions:                                           ;;
 ;;                                                                           ;;
 ;;   (defun `mwg-doxygen-font-lock-keywords')                                ;;
+;;                                                                           ;;
+;; Provided customizable faces                                               ;;
+;;                                                                           ;;
 ;;   (defface `mwg-doxygen/content-face')                                    ;;
 ;;   (defface `mwg-doxygen/keyword-face')                                    ;;
 ;;   (defface `mwg-doxygen/title-face')                                      ;;
@@ -35,10 +38,15 @@
 ;;   (defface `mwg-doxygen/code-face')                                       ;;
 ;;   (defface `mwg-doxygen/xml-delim-face')                                  ;;
 ;;   (defface `mwg-doxygen/lwiki-bold-face')                                 ;;
+;;   (defface `mwg-doxygen/mwgpp-face'                                       ;;
+;;   (defface `mwg-doxygen/mwgpp-directive-name'                             ;;
+;;   (defface `mwg-doxygen/mwgpp-macro-name'                                 ;;
 ;;                                                                           ;;
 ;;---------------------------------------------------------------------------;;
 ;; ChangeLog                                                                 ;;
 ;;                                                                           ;;
+;;   2016-04-04, v1.0.5, KM,                                                 ;;
+;;     * new: support mwgpp                                                  ;;
 ;;   2016-04-01, v1.0.4, KM,                                                 ;;
 ;;     * new: support lwiki                                                  ;;
 ;;     * bugfix: 行コメント結合時のインデント                                ;;
@@ -146,6 +154,27 @@
   "Face used to emphasize phrases in lwiki."
   :version "24.1"
   :group 'mwg-doxygen)
+(defface mwg-doxygen/mwgpp-face
+  '((((class color) (min-colors 88) (background light))
+     (:inherit font-lock-comment-face)) ;; :background "color-225"
+    (default :inherit font-lock-comment-face))
+  "Face used to highlight mwgpp commands."
+  :version "24.1"
+  :group 'mwg-doxygen)
+(defface mwg-doxygen/mwgpp-macro-name
+  '((((class color) (min-colors 88) (background light))
+     (:inherit font-lock-variable-name-face)) ;; :foreground "color-198"
+    (default :inherit font-lock-variable-name-face))
+  "Face used to highlight mwgpp macro names."
+  :version "24.1"
+  :group 'mwg-doxygen)
+(defface mwg-doxygen/mwgpp-directive-name
+  '((default :foreground "brightblue" :inherit font-lock-preprocessor-face))
+  "Face used to highlight mwgpp directive names."
+  :version "24.1"
+  :group 'mwg-doxygen)
+
+(defconst mwg-doxygen/pragma-prefix "^[[:space:]]*#[[:space:]]*pragma\\_>[[:space:]]*")
 
 (defconst mwg-doxygen/rex-NCName "[_[:alpha:]][-._[:alnum:]]*")
 (defconst mwg-doxygen/rex-csymf "[^ -/:-@[-^`{-~[:cntrl:][:space:]0-9]")
@@ -160,18 +189,16 @@
        (rex_tmpl2 (concat "<\\(?:[^<>()'\"]\\|" rex_tmpl1 "\\|" rex_pr1 "\\|" rex_str "\\)*>"))
        (rex_tmpl3 (concat "<\\(?:[^<>()'\"]\\|" rex_tmpl2 "\\|" rex_pr2 "\\|" rex_str "\\)*>"))
        (rex_tmpl4 (concat "<\\(?:[^<>()'\"]\\|" rex_tmpl3 "\\|" rex_pr3 "\\|" rex_str "\\)*>"))
-       (rex_tmpl5 (concat "<\\(?:[^<>()'\"]\\|" rex_tmpl4 "\\|" rex_pr4 "\\|" rex_str "\\)*>")))
-  (defconst mwg-doxygen/rex-string-literal rex_str)
-  (defconst mwg-doxygen/rex-nested-paren rex_pr5)
-  (defconst mwg-doxygen/rex-template-argument rex_tmpl5))
-
-;; (defconst mwg-doxygen/rex-tex_brace
-;;   (let* ((rex_br1 "{[^{}]*}")
-;;          (rex_br2 (concat "{\\(?:[^{}]\\|" rex_br1 "\\)*}"))
-;;          (rex_br3 (concat "{\\(?:[^{}]\\|" rex_br2 "\\)*}"))
-;;          (rex_br4 (concat "{\\(?:[^{}]\\|" rex_br3 "\\)*}"))
-;;          (rex_br5 (concat "{\\(?:[^{}]\\|" rex_br4 "\\)*}")))
-;;     rex_br5))
+       (rex_tmpl5 (concat "<\\(?:[^<>()'\"]\\|" rex_tmpl4 "\\|" rex_pr4 "\\|" rex_str "\\)*>"))
+       (lwiki_br1 "{[^{}]*}")
+       (lwiki_br2 (concat "{\\(?:[^{}]\\|" lwiki_br1 "\\)*}"))
+       (lwiki_br3 (concat "{\\(?:[^{}]\\|" lwiki_br2 "\\)*}"))
+       (lwiki_br4 (concat "{\\(?:[^{}]\\|" lwiki_br3 "\\)*}"))
+       (lwiki_br5 (concat "{\\(?:[^{}]\\|" lwiki_br4 "\\)*}")))
+  (defconst mwg-doxygen/rex:c++-string-literal rex_str)
+  (defconst mwg-doxygen/rex:c++-nested-paren rex_pr5)
+  (defconst mwg-doxygen/rex:c++-template-argument rex_tmpl5)
+  (defconst mwg-doxygen/rex:lwiki-nested-brace lwiki_br5))
 
 (defconst mwg-doxygen/doc:doxygen/rex-line-head
   "\\(?:^[[:space:]]*\\(?:/\\*[*!]<?\\|//[/!]<?\\|\\*\\)[[:space:]]?\\)")
@@ -185,11 +212,6 @@
                ;;↑これだと _ の連続に対し超線形になる。_ の開始をうまく捉えられていない。
                (rex_cv "\\(?:\\s *\\_<\\(?:const\\|volatile\\)\\_>\\)*")
                (rex_end "\\(?:\\Sw\\|$\\)")
-               (rex_ab1 (concat "<\\(?:[^<>()]\\|" mwg-doxygen/rex-nested-paren "\\)*>"))
-               (rex_ab2 (concat "<\\(?:[^<>()]\\|" mwg-doxygen/rex-nested-paren "\\|" rex_ab1 "\\)*>"))
-               (rex_ab3 (concat "<\\(?:[^<>()]\\|" mwg-doxygen/rex-nested-paren "\\|" rex_ab2 "\\)*>"))
-               (rex_ab4 (concat "<\\(?:[^<>()]\\|" mwg-doxygen/rex-nested-paren "\\|" rex_ab3 "\\)*>"))
-               (rex_ab5 (concat "<\\(?:[^<>()]\\|" mwg-doxygen/rex-nested-paren "\\|" rex_ab4 "\\)*>"))
                ;; from http://blog.livedoor.jp/dankogai/archives/51189905.html
                (mail_atom      "[a-zA-Z0-9_!#$%&'*+/=?^`{}~|-]+")
                (mail_dot_atom  (concat mail_atom "\\(?:\\." mail_atom "\\)*"))
@@ -201,12 +223,12 @@
           (concat
            "\\("
              ;; 関数名(...) など
-             "\\(?:\\(?:#\\|::\\)?" rex_id "\\(?:" rex_ab5 "\\)?\\)+"
-             "\\(?:" mwg-doxygen/rex-nested-paren rex_cv "\\)"
+             "\\(?:\\(?:#\\|::\\)?" rex_id "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)?\\)+"
+             "\\(?:" mwg-doxygen/rex:c++-nested-paren rex_cv "\\)"
            "\\|"
              ;; クラス名::関数名 など
-             "\\(?:" rex_id "\\(?:" rex_ab5 "\\)?\\)?"
-             "\\(?:\\(?:#\\|::\\)" rex_id "\\(?:" rex_ab5 "\\)?\\)+"
+             "\\(?:" rex_id "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)?\\)?"
+             "\\(?:\\(?:#\\|::\\)" rex_id "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)?\\)+"
            "\\)" rex_end "\\|\\("
              ;; URL
              "\\<\\(?:https?\\|ftp\\|file\\)://"
@@ -382,17 +404,125 @@
      (1 'font-lock-variable-name-face prepend t)
      (2 'font-lock-string-face prepend t))))
 
+(defconst mwg-doxygen/doc:mwgpp/rex-prefix (concat "//%\\|" mwg-doxygen/pragma-prefix "%"))
+(defconst mwg-doxygen/doc:mwgpp/rex-line-head (concat "\\(?:^[[:space:]]*//\\|" mwg-doxygen/pragma-prefix "\\)%[[:space:]%]*"))
+(defconst mwg-doxygen/doc:mwgpp/keywords
+  `(("^[[:space:]]*\\(?://\\|#pragma[[:space:]]*\\)\\(%[[:space:]%]*\\)\\|\\(.+\\)"
+     (1 '(mwg-doxygen/mwgpp-directive-name mwg-doxygen/mwgpp-face) prepend t)
+     (2 'mwg-doxygen/mwgpp-face prepend t))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(\\[\\)\\(.*\\)\\(\\]\\)$")
+     (1 '(mwg-doxygen/mwgpp-directive-name bold) prepend nil)
+     (2 mwg-doxygen/simple-c++-keylist keylist)
+     (3 '(mwg-doxygen/mwgpp-directive-name mwg-doxygen/lwiki-bold-face) prepend nil))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\([[:alpha:]_][[:alnum:]_]*\\|[<>$]\\)")
+     (1 'mwg-doxygen/mwgpp-directive-name prepend nil))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(?:m\\|define\\)[[:space:]]+\\([[:alnum:]_:]+\\)\\(?:[[:space:]]+\\([[:alnum:]_:]+\\)\\(.+\\)?\\)?")
+     (1 '(mwg-doxygen/mwgpp-macro-name bold) prepend nil)
+     (2 'mwg-doxygen/mwgpp-macro-name prepend t)
+     (3 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(?:x\\|expand\\)[[:space:]]+\\([[:alnum:]_:]+\\)\\(.+\\)?")
+     (1 'mwg-doxygen/mwgpp-macro-name prepend nil)
+     (2 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))
+    (,(concat mwg-doxygen/doc:mwgpp/rex-line-head "\\(?:[)]\\|end\\)\\(.+\\)?")
+     (1 mwg-doxygen/doc:mwgpp/modifiers-keylist keylist t))))
+(defconst mwg-doxygen/doc:mwgpp/modifiers-keylist
+  (let ((seq "\\(?:[^\\]\\|\\\\.\\)*?"))
+    `((,(concat
+       "[[:space:]]+"
+       "\\|\\.[rR]\\(.\\)" seq "\\1" seq "\\1"
+       "\\|\\.f\\(.\\)" seq "\\2" seq "\\2" seq "\\2"
+       "\\|\\.\\(i\\)"
+       "\\|\\(.+\\)")
+       (cond
+        ((match-beginning 1)
+         (goto-char (match-beginning 0))
+         (if (looking-at ,(concat "\\.\\([rR]\\)\\(.\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)"))
+             nil (message "rR match failed at %d" (match-beginning 1)))
+         '((1 'font-lock-function-name-face prepend t)
+           (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
+           (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (5 mwg-doxygen/doc:mwgpp/replacement-keylist keylist t)
+           (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)))
+        ((match-beginning 2)
+         (goto-char (match-beginning 0))
+         (looking-at ,(concat "\\.\\([f]\\)\\(.\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)\\(" seq "\\)\\(\\2\\)"))
+         '((1 'font-lock-function-name-face prepend t)
+           (2 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (3 mwg-doxygen/doc:mwgpp/regexp-keylist keylist t)
+           (4 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (5 mwg-doxygen/simple-c++-keylist keylist t)
+           (6 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)
+           (7 mwg-doxygen/simple-c++-keylist keylist t)
+           (8 '(font-lock-regexp-grouping-backslash font-lock-string-face) prepend t)))
+        (t
+         '((3 'font-lock-function-name-face prepend t)
+           (4 'font-lock-warning-face prepend t)))))
+      )))
+
+(defconst mwg-doxygen/doc:mwgpp/regexp-keylist
+  (let* ((rex-atomic "(\\(?:\\?[!=:]\\)?\\|[)|^$]")
+         (rex-charclass "\\[\\^?\\(?:\\[:[^][]+:\\]\\|\\[=[^][]+=\\]\\|\\[.[^][]+.\\]\\|[^]\\]\\|\\\\.\\)*\\]")
+         (rex-quantifier "\\(?:[*?+]\\|{[0-9]*\\(?:,[0-9]*\\)?}\\)\\??"))
+    `((".+"
+       (0 'mwg-doxygen/regexp prepend nil))
+      (,(concat "\\(" rex-atomic "\\)\\|\\(" rex-charclass "\\)\\|\\(" rex-quantifier "\\)\\|\\(\\\\.\\)")
+       (1 'mwg-doxygen/regexp-grouping-construct prepend t)
+       (when (match-beginning 2)
+         (let* ((b0 (match-beginning 2))
+                (b1 (+ b0 (if (= (char-after (1+ b0)) ?^) 2 1)))
+                (e0 (match-end 2))
+                (e1 (1- e0)))
+           (font-lock-prepend-text-property b0 e0 'face 'mwg-doxygen/regexp-character-class)
+           (font-lock-prepend-text-property b0 b1 'face 'mwg-doxygen/regexp-grouping-construct)
+           (font-lock-prepend-text-property e1 e0 'face 'mwg-doxygen/regexp-grouping-construct)))
+       (3 'mwg-doxygen/regexp-quantifier prepend t)
+       (4 'font-lock-constant-face prepend t)))))
+(defconst mwg-doxygen/doc:mwgpp/replacement-keylist
+  '((".+"
+     (0 'mwg-doxygen/regexp prepend nil))
+    ("\\(\\$[0-9]+\\)\\|\\(\\\\.\\)"
+     (1 'font-lock-variable-name-face prepend t)
+     (2 'font-lock-constant-face prepend t))))
+
+;; the following faces are taken from mwg-js2-config.el
+(defface mwg-doxygen/regexp
+  '((((class color) (min-colors 88) (background light))
+     (:foreground "forestgreen"
+                  ;;:background "color-194"
+                  :inherit font-lock-string-face))
+    (default :inherit font-lock-string-face))
+  "Face used to highlight regular expressions"
+  :version "24.1"
+  :group 'mwg-doxygen)
+(defface mwg-doxygen/regexp-grouping-construct
+  '((((class color) (min-colors 88) (background light))
+     (:foreground "brightblue" :weight normal :inherit (font-lock-regexp-grouping-construct mwg-doxygen/regexp)))
+    (default :inherit (font-lock-regexp-grouping-construct mwg-doxygen/regexp)))
+  "Face used to highlight grouping constructs in regular expressions"
+  :version "24.1"
+  :group 'mwg-doxygen)
+(defface mwg-doxygen/regexp-quantifier
+  '((((class color) (min-colors 88) (background light))
+     (:foreground "purple" :inherit (font-lock-builtin-face mwg-doxygen/regexp)))
+    (default :inherit (font-lock-builtin-face mwg-doxygen/regexp)))
+  "Face used to highlight quantifiers in regular expressions"
+  :version "24.1"
+  :group 'mwg-doxygen)
+(defface mwg-doxygen/regexp-character-class
+  '((((class color) (min-colors 88) (background light))
+     (:foreground "steelblue" :inherit (font-lock-type-face mwg-doxygen/regexp)))
+    (default :inherit (font-lock-type-face mwg-doxygen/regexp)))
+  "Face used to highlight the content of a character class in regular expressions"
+  :version "24.1"
+  :group 'mwg-doxygen)
+
 (defconst mwg-doxygen/doc:lwiki/rex-line-head
   "\\(?:^[[:space:]]*\\(?:\\(?:/[/*]\\)\\?lwiki\\_>\\|\\*\\)[[:space:]]?\\)")
 
 (defconst mwg-doxygen-font-lock-lwiki-comments
   (let* ((rex_sword "[^[:space:][:cntrl:]]+")
-         (rex_br1 "{[^{}]*}")
-         (rex_br2 (concat "{\\(?:[^{}]\\|" rex_br1 "\\)*}"))
-         (rex_br3 (concat "{\\(?:[^{}]\\|" rex_br2 "\\)*}"))
-         (rex_br4 (concat "{\\(?:[^{}]\\|" rex_br3 "\\)*}"))
-         (rex_br5 (concat "{\\(?:[^{}]\\|" rex_br4 "\\)*}"))
-         (rex_braced (concat "\\(?:[^{}]\\|" rex_br5 "\\)*"))
+         (rex_braced (concat "\\(?:[^{}]\\|" mwg-doxygen/rex:lwiki-nested-brace "\\)*"))
          (rex_prog_decl (concat "\\(?:"
                                 (mwg/rex-or
                                  "fn" "var" "op" "param" "typedef" "class" "namespace"
@@ -664,7 +794,7 @@
           ;; Comments
           "\\|\\(//.*\\(?:\n\\|$\\)?\\|/\\*\\(?:[^*/]+\\|[*][^/]\\|[*]\\'\\)*\\(?:\\*/\\)?\\)"
           ;; String Literals
-          "\\|\\(" mwg-doxygen/rex-string-literal "\\)"
+          "\\|\\(" mwg-doxygen/rex:c++-string-literal "\\)"
           ;; Number Literals
           "\\|\\(\\_<0[xX][0-9-a-fA-F]+\\_>\\|\\(?:\\_<\\|\\.\\)[0-9]\\(?:[.0-9]\\|[eE][-+]?\\)*[_a-zA-Z0-9]*\\)"
           ;; Composite Keywords
@@ -704,11 +834,11 @@
                  '(5 'font-lock-type-face prepend t))
                 ;; function name
                 ((progn (goto-char end)
-                        (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex-template-argument "\\)?(")))
+                        (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)?(")))
                  '(5 'font-lock-function-name-face prepend t))
                 ;; template name
                 ((progn (goto-char end)
-                        (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex-template-argument "\\)")))
+                        (looking-at-p ,(concat "\\(?:" mwg-doxygen/rex:c++-template-argument "\\)")))
                  '(5 'font-lock-type-face prepend t))
                 ;; variable decl
                 ((or (progn (goto-char beg) nil)
@@ -726,6 +856,13 @@
 ;;;###autoload
 (defun mwg-doxygen-font-lock-keywords ()
   `((,(lambda (limit)
+        (let ((mwg-doxygen/local:document-line-head mwg-doxygen/doc:mwgpp/rex-line-head))
+          (save-excursion
+            (mwg-doxygen/c-font-lock-doc-pragmas mwg-doxygen/doc:mwgpp/rex-prefix limit
+                                                 mwg-doxygen/doc:mwgpp/keywords))
+          (save-excursion
+            (mwg-doxygen/c-font-lock-doc-comments mwg-doxygen/doc:mwgpp/rex-prefix limit
+                                                  mwg-doxygen/doc:mwgpp/keywords)))
         (save-excursion
           (let ((mwg-doxygen/local:document-line-head mwg-doxygen/doc:lwiki/rex-line-head))
             (mwg-doxygen/c-font-lock-doc-comments "/[*/]\\?lwiki\\_>" limit
@@ -737,6 +874,47 @@
 ;;*****************************************************************************
 ;;  Modification of library functions
 ;;-----------------------------------------------------------------------------
+
+(defun mwg-doxygen/get-pragma-range/end ()
+  (end-of-line)
+  (if (= (char-after) ?\n)
+      (forward-char))
+  (point))
+(defun mwg-doxygen/get-pragma-range (prefix)
+  "現在位置が #pragma 行の途中の場合に #pragma の範囲を取得します。
+\(開始位置 . 終端位置\) のペアを返します。
+現在位置が #pragma 行の途中でなかった場合は nil を返します。"
+  (save-excursion
+    (beginning-of-line)
+    (and (looking-at-p mwg-doxygen/pragma-prefix)
+         (looking-at-p prefix)
+         (cons (point) (mwg-doxygen/get-pragma-range/end)))))
+(defun mwg-doxygen/get-next-pragma-range (prefix limit)
+  "次の #pragma の範囲を取得します。
+\(開始位置 . 終端位置\) のペアを返します。"
+  (save-excursion
+    (let ((found))
+      (while (and (not found)
+                  (re-search-forward mwg-doxygen/pragma-prefix limit t)
+                  (goto-char (match-beginning 0)))
+        (if (looking-at-p prefix)
+            (setq found t)
+          (forward-char)))
+      (and found (cons (point) (mwg-doxygen/get-pragma-range/end))))))
+(defun mwg-doxygen/c-font-lock-doc-pragmas (prefix limit keylist)
+  (let* ((dirty-range (cons (point) limit)) ;; for debug
+         (pragma-range (mwg-doxygen/get-pragma-range prefix)))
+    (while (or pragma-range
+               (setq pragma-range (mwg-doxygen/get-next-pragma-range prefix limit)))
+      (let* ((region-beg (car pragma-range))
+             (region-end (min limit (cdr pragma-range))))
+        ;;(message "mwg-doxygen/c-font-lock-doc-pragmas: dirty-range %S, region %d-%d" dirty-range region-beg region-end)
+        (save-restriction
+          (narrow-to-region region-beg region-end)
+          (mwg-doxygen/font-lock-apply-keylist region-beg region-end keylist)
+          (goto-char region-end)))
+      (setq pragma-range nil)))
+  nil)
 
 ;; comments and doc-comments
 (defun mwg-doxygen/comment-styleb-p (&optional pos)
@@ -803,8 +981,7 @@ POS is the beginning position of a comment."
 ;; cc-fonts function
 (defun mwg-doxygen/c-font-lock-doc-comments (prefix limit keylist)
   "a modified version of `c-font-lock-doc-comments' in cc-fonts.el"
-  (let* ((range-beg (point))
-         (range-end limit)
+  (let* ((dirty-range (cons (point) limit))
          (doc-beg (mwg-doxygen/get-beginning-of-doc prefix))
          (region-beg doc-beg))
     (while (or doc-beg
@@ -819,16 +996,16 @@ POS is the beginning position of a comment."
                                        (= (char-before doc-end) ?/))
                                   (- doc-end 2)
                                 doc-end))))
-        ;; 範囲 [range-beg range-end]
+        ;; 範囲 [dirty-beg dirty-end]
         ;;   ドキュメントコメントの探索範囲を示す。
         ;; 範囲 [doc-beg doc-end]
         ;;   見付かったドキュメントコメントの範囲を示す。
-        ;;   端点 doc-beg, doc-end は必ずしも [range-beg range-end] の内部にあるとは限らない。
+        ;;   端点 doc-beg, doc-end は必ずしも [dirty-beg dirty-end] の内部にあるとは限らない。
         ;; 範囲 [region-beg region-end]
         ;;   ドキュメントコメント内部の着色を行う範囲を示す。
         ;;   基本的にはドキュメントコメント (/*prefix ... */ や //prefix) の範囲であり、
         ;;   limit がドキュメントコメントの途中にあればそこで途切れる。
-        ;; (message "mwg-doxygen: range %d-%d region %d-%d" range-beg range-end region-beg region-end)
+        ;; (message "mwg-doxygen: dirty-range %S, region %d-%d" dirty-range region-beg region-end)
         (save-restriction
           ;;(c-put-font-lock-face region-beg region-end c-doc-face-name)
           (narrow-to-region region-beg region-end)
@@ -865,44 +1042,52 @@ REGEXP には適用対象を指定します。
 
   REGEXP = '(lambda (limit) ...内部でmatch-dataを設定しnil以外を返す または nilを返す...)
 
-HIGHLIGHTER has one of the followings forms:
-
-* match-highlight
-    := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
-  Applies font face to the range with specified match index.
-  It is the argument for the `font-lock-apply-highlight'.
-* list of match-highlights
-    := (<match-highlight> <match-highlight> ... <match-highlight>)
-  Applies font face to the multiple ranges with specified match indices.
-* program := e.g. ((progn ...))
-  This S-expression can return a list of match-highlights. This is an extension.
-* nil"
+REGEXP が一致した時、HIGHLIGHTER が `mwg-doxygen/font-lock-apply-recursive-highlight' によって適用されます。
+HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight' の説明を参照して下さい。"
   (let ((matcher (eval regexp)))
     (while (if (stringp matcher)
                (re-search-forward matcher limit t)
              (funcall matcher limit))
       ;; 2015-02-01内部で (point) を移動すると同じ箇所に二重に適用したりするので save-excursion で囲む
       (save-excursion
-        (let* ((highlighter highlighter)
-               (head (car highlighter)))
-          (if (not (consp head))
-              ;; highlighter = (0 'hoge-face foo bar)
-              (mwg-doxygen/font-lock-apply-highlight highlighter)
-            (while highlighter
-              (let ((head (car highlighter)) rules)
-                (cond
-                 ((integerp (car head))
-                  ;; highlighter = ((0 'face foo bar) (1 'face foo bar) ...)
-                  (mwg-doxygen/font-lock-apply-highlight head))
-                 ((symbolp (car head))
-                  ;; highlighter = ((progn ...))
-                  (when (setq rules (eval head))
-                    (if (consp (car rules))
-                        (while rules
-                          (mwg-doxygen/font-lock-apply-highlight (car rules))
-                          (setq rules (cdr rules)))
-                      (mwg-doxygen/font-lock-apply-highlight rules))))))
-              (setq highlighter (cdr highlighter)))))))))
+        (mwg-doxygen/font-lock-apply-recursive-highlight highlighter)))))
+
+(defun mwg-doxygen/font-lock-apply-recursive-highlight (highlighter)
+"HIGHLIGHTER has one of the followings forms:
+
+* HIGHLIGHTER := <highliter>
+
+* <highlighter> := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
+  If the first element is an integer, <highlighter> is treated as this quartet form.
+  Applies font face to the range with specified match index.
+  It is the argument for the `font-lock-apply-highlight'.
+
+* <highlighter> := (progn ...)
+  If the first element is a symbol, <highlighter> is treated as a program.
+  This S-expression can return a <highlighter> object which will be recursively processed.
+
+* <highlighter> := (<highlighter> <highlighter> ... <highlighter>)
+  Each sub highlighter is applied in order.
+
+* nil
+  Nothing applied."
+  (if (consp highlighter)
+      (let ((head (car highlighter))
+            (tail (cdr highlighter)))
+        (cond
+         ((integerp head)
+          (mwg-doxygen/font-lock-apply-highlight highlighter))
+         ((symbolp head)
+          (mwg-doxygen/font-lock-apply-recursive-highlight (eval highlighter)))
+         ((or (not tail) (consp tail))
+          (while head
+            (mwg-doxygen/font-lock-apply-recursive-highlight head)
+            (setq head (car tail)
+                  tail (cdr tail))))
+         (t
+          (error "invalid format of highlighter: %S" highlighter))))
+    (if highlighter
+        (error "invalid format of highlighter: %S" highlighter))))
 
 (defun mwg-doxygen/font-lock-apply-highlight (highlight)
   "a version of `font-lock-apply-highlight' with 'remove as an override spec.
