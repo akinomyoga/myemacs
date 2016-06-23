@@ -368,6 +368,13 @@ This function has the different behaviors with original one in the following two
                           (c-set-offset 'template-args-cont '+)
                           ))
 
+;; http://qiita.com/marcy_o/items/a3e9f99baa07d16bef95
+;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
+(add-hook 'before-save-hook
+          '(lambda()
+             (when c-buffer-is-cc-mode
+               (delete-trailing-whitespace))))
+
 ;******************************************************************************
 ;
 ;  Defining Key Translations
