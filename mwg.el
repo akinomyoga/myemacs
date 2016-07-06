@@ -368,6 +368,13 @@ This function has the different behaviors with original one in the following two
                           (c-set-offset 'template-args-cont '+)
                           ))
 
+;; http://qiita.com/marcy_o/items/a3e9f99baa07d16bef95
+;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
+(add-hook 'before-save-hook
+          '(lambda()
+             (when c-buffer-is-cc-mode
+               (delete-trailing-whitespace))))
+
 ;******************************************************************************
 ;
 ;  Defining Key Translations
@@ -449,14 +456,14 @@ This function has the different behaviors with original one in the following two
 (defun mwg-kill-region (&optional count)
   (interactive "p")
   (if mark-active
-      (kill-region (mark) (point))
+      (call-interactively 'kill-region)
     (beginning-of-line 1)
     (kill-region (line-beginning-position 1)
                  (line-beginning-position (1+ (if count count 1))))))
 (defun mwg-copy-as-kill (&optional count)
   (interactive "p")
   (if mark-active
-      (kill-ring-save (mark) (point))
+      (call-interactively 'kill-ring-save)
     (kill-ring-save (line-beginning-position 1)
                     (line-beginning-position (1+ (if count count 1))))
     (beginning-of-line)))
