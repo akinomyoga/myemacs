@@ -1,5 +1,5 @@
 ;;; rosaterm.el --- terminal support code for rosaterm
-;; Copyright (C) 2011-2012 K. Murase.
+;; Copyright (C) 2011-2016 K. Murase.
 
 (load "term/xterm")
 
@@ -239,12 +239,19 @@
     (set-keymap-parent map (keymap-parent default-map))
     (set-keymap-parent default-map map)))
 
+(eval-when-compile
+  ;; variables defined in auto-complete-mode
+  (defvar xterm-standard-colors)
+  (declare-function xterm-register-default-colors "term/xterm"))
+
 (defun terminal-init-rosaterm ()
   "Terminal initialization function for rosaterm."
   ;; Use the xterm color initialization code.
 
   (rosaterm-register-keymap)
-  (xterm-register-default-colors)
+  (if (< emacs-major-version 25)
+      (xterm-register-default-colors)
+    (xterm-register-default-colors xterm-standard-colors))
   (tty-set-up-initial-frame-faces))
 
 ;;; rosaterm.el ends here

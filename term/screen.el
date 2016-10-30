@@ -1,7 +1,7 @@
 ;;; screen.el --- terminal support code for screen-256color -*- no-byte-compile: t -*-
 ;; Treat a screen terminal similar to an xterm.
 
-;; Copyright (C) 2011-2012 K. Murase.
+;; Copyright (C) 2011-2016 K. Murase.
 
 (load "term/xterm")
 
@@ -14,7 +14,9 @@
 (defun terminal-init-screen ()
   "Terminal initialization function for screen."
   ;; Use the xterm color initialization code.
-  (xterm-register-default-colors)
+  (if (< emacs-major-version 25)
+      (xterm-register-default-colors)
+    (xterm-register-default-colors xterm-standard-colors))
   (tty-set-up-initial-frame-faces)
   (cond
    ((string= (getenv "MWG_LOGINTERM") "cygwin")
