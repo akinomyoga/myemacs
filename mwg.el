@@ -372,7 +372,8 @@ This function has the different behaviors with original one in the following two
 ;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
 (add-hook 'before-save-hook
           '(lambda()
-             (when (and c-buffer-is-cc-mode
+             (when (and (boundp 'c-buffer-is-cc-mode)
+                        c-buffer-is-cc-mode
                         (not (and (boundp 'mwg-no-delete-trailing-whitespaces)
                                   mwg-no-delete-trailing-whitespaces)))
                (delete-trailing-whitespace))))
