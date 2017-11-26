@@ -39,9 +39,8 @@
 ;; Loading Other Libraries
 ;;
 ;;=============================================================================
-;; settings for auto-complete
-;;-----------------------------------------------------------------------------
 
+;;---- auto-complete-mode -----------------------------------------------------
 (eval-when-compile
   ;; variables defined in auto-complete-mode
   (defvar ac-mode-map)
@@ -377,6 +376,23 @@ This function has the different behaviors with original one in the following two
                         (not (and (boundp 'mwg-no-delete-trailing-whitespaces)
                                   mwg-no-delete-trailing-whitespaces)))
                (delete-trailing-whitespace))))
+
+
+;;---- regexp \b --------------------------------------------------------------
+;; 今まで悩まされていたのだが、実はこれは設定可能だった…
+
+(defun mwg/regexp-word-boundary/.mode-hook ()
+  (modify-syntax-entry ?_ "w"))
+(add-hook 'text-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'c-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'c++-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'csharp-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'awk-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'sh-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'js-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'css-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'perl-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
+(add-hook 'php-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
 
 ;******************************************************************************
 ;
