@@ -213,7 +213,8 @@ This function has the different behaviors with original one in the following two
     (local-set-key [?\C->] "&gt;")
     (local-set-key [?\C-&] "&amp;")
     (local-set-key [?\C-c ?\C-c] 'mwg-xml-tag-region))
-  (add-hook 'nxml-mode-hook 'mwg-add-hook/xml-mode-hook))
+  (add-hook 'nxml-mode-hook 'mwg-add-hook/xml-mode-hook)
+  (add-to-list 'auto-mode-alist '("\\.x?html?$" . nxml-mode)))
 
 ;;---- mwg-c++exp/cc-mode -----------------------------------------------------
 ;; settings for mwg-c++exp
