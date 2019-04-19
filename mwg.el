@@ -413,7 +413,7 @@ This function has the different behaviors with original one in the following two
   ;; (define-key keymap (kbd "ESC <prior>"     ) (kbd "<M-prior>" )) ; moto-kara yuko
   ;; (define-key keymap (kbd "ESC <next>"      ) (kbd "<M-next>"  )) ; moto-kara yuko
   
-  (when nil ; dbg
+  (when nil ; for debugging
     (global-set-key (kbd "<C-prior>") (kbd "C P g U p"))
     (global-set-key (kbd "<C-next>")  (kbd "C P g D n"))
     (global-set-key (kbd "<C-M-next>")  (kbd "C M P g D n"))
@@ -541,6 +541,13 @@ This function has the different behaviors with original one in the following two
 
 ;; 元々 \C-x\C-b に割り当てられていた 'list-buffers を \C-xb にする:
 ;; (global-set-key "\C-xb" 'list-buffers)
+
+;; スクロールの設定
+(setq scroll-margin 1)
+(setq scroll-conservatively 1)
+
+;; next, prior による overlap 行数の指定
+;; (setq next-screen-context-lines 5)
 
 ;;-----------------------------------------------------------------------------
 ;;  replaces
