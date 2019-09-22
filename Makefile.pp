@@ -23,8 +23,8 @@ $(EMACSD)/%file%: ${fsrc} | $(EMACSD)%directory%
 #%%[fsrc=fdst.replace("^my/","")]
 #%%x
 # mylisp::elc %file%
-copyfiles+=$(EMACSD)/%file%
-compilefiles+=$(EMACSD)/%file%c
+copyfiles += $(EMACSD)/%file%
+compilefiles += $(EMACSD)/%file%c
 $(EMACSD)/%file%: ${fsrc} | $(EMACSD)%directory%
 $(EMACSD)/%file%c: $(EMACSD)/%file%
 
@@ -88,8 +88,8 @@ $(copyfiles):
 
 all:
 
-packages+=js2-mode
-packages+=auto-complete
+packages += js2-mode
+packages += auto-complete
 package-install $(MYDIR)/package-install.stamp: | $(MYDIR)
 	./make_command.sh package-install $(packages)
 	touch $(MYDIR)/package-install.stamp

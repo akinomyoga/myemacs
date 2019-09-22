@@ -11,7 +11,6 @@ function command.package-install {
   {
     echo "(require 'package)"
     echo "(add-to-list 'package-archives '(\"melpa\" . \"http://melpa.milkbox.net/packages/\") t)"
-    echo "(add-to-list 'package-archives '(\"marmalade\" . \"http://marmalade-repo.org/packages/\"))"
     echo "(setq url-http-attempt-keepalives nil)"
     echo "(package-refresh-contents)"
     echo "(package-initialize)"
@@ -22,8 +21,9 @@ function command.package-install {
     echo "(message \"done\")"
   } > tmp.el
 
-  $EMACS --batch -l tmp.el
+  $EMACS --batch -l tmp.el; local ext=$?
   rm tmp.el
+  return "$ext"
 }
 
 if (($#==0)); then
@@ -37,7 +37,7 @@ if (($#==0)); then
   exit 1
 fi
 
-alpha="$1"
+alpha=$1
 shift
 if ! declare -f "command.$alpha" &>/dev/null; then
   printf "make_command: %q is not valid command name.\n" "$alpha" >&2
