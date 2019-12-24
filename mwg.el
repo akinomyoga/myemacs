@@ -1091,7 +1091,9 @@ This function has the different behaviors with original one in the following two
 
 (defun mwg-init-mouse ()
   (when (or (string= (getenv "TERM") "rosaterm")
-            (and (or (string= (getenv "TERM") "screen")
+            (and (or (string= (getenv "TERM") "xterm")
+                     (string= (getenv "TERM") "xterm-256color")
+                     (string= (getenv "TERM") "screen")
                      (string= (getenv "TERM") "screen-256color"))
                  (string= (getenv "MWG_LOGINTERM") "rosaterm")))
     (require 'mouse)
