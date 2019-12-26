@@ -35,7 +35,6 @@ $(eval $(call MyLispCopy,my/term/screen.el))
 
 #dirs += $(EMACSD)/lisp $(EMACSD)/lisp/auto-install
 #$(eval $(call MyLispCompile,lisp/csharp-mode.el))
-$(eval $(call MyLispCompile,lisp/gnuplot.el))
 
 # $(eval $(call MyLispCompile,lisp/fuzzy.el))
 # $(eval $(call MyLispCompile,lisp/popup.el))

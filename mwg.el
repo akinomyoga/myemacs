@@ -142,16 +142,6 @@ This function has the different behaviors with original one in the following two
 
 )
 
-;;---- gnuplot-mode -----------------------------------------------------------
-(defun mwg-add-hook-gnuplot (gnuplot-path)
-  (autoload 'gnuplot-mode "gnuplot" "gnuplot major mode" t)
-  (autoload 'gnuplot-make-buffer "gnuplot" "open a buffer in gnuplot mode" t)
-  (setq auto-mode-alist (append '(("\\.\\(gp\\|plt\\)$" . gnuplot-mode)) auto-mode-alist))
-  
-  ;; for MS windows
-  (add-hook 'gnuplot-load-hook
-            (list 'lambda '() (list 'setq 'gnuplot-program gnuplot-path))))
-
 ;;---- csharp-mode ------------------------------------------------------------
 (defun mwg-add-hook-csharp ()
   (autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
