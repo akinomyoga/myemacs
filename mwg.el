@@ -190,7 +190,7 @@ This function has the different behaviors with original one in the following two
          (m_id (and m_r (match-string 3 tag1)))
          (tagE (if (> (length m_tag) 0) m_tag "xml"))
          (tagS1 (if (and m_id (> (length m_id) 0))
-                    (concat tagE " m_id=\"" m_id "\"")
+                    (concat tagE " id=\"" m_id "\"")
                   tagE))
          (tagS (if (and m_cls (> (length m_cls) 0))
                    (concat tagS1 " class=\"" m_cls "\"")
@@ -571,6 +571,13 @@ This function has the different behaviors with original one in the following two
     (mreplace/replace-string "&" "&amp;" s e)
     (mreplace/replace-string "<" "&lt;" s e)
     (mreplace/replace-string ">" "&gt;" s e)))
+
+;; 2019-12-26 global settings for HTML/XML tags
+(global-set-key [?\C-c ?\C-,] "&lt;")
+(global-set-key [?\C-c ?\C-.] "&gt;")
+(global-set-key [?\C-c ?\C-6] "&amp;")
+(global-set-key [?\C-c ?\C-@] 'mwg-xml-tag-region)
+
 ;;-----------------------------------------------------------------------------
 ;;  how to define key mappings
 ;;-----------------------------------------------------------------------------
