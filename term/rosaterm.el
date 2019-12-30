@@ -1,6 +1,8 @@
 ;;; rosaterm.el --- terminal support code for rosaterm
-;; Copyright (C) 2011-2016 K. Murase.
+;; Copyright (C) 2011-2019 K. Murase.
 
+(provide 'term/rosaterm)
+(require 'term/rosaterm)
 (load "term/xterm")
 
 ;;; This is for GNU Emacs 21
