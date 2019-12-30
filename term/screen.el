@@ -17,17 +17,6 @@
   (if (< emacs-major-version 25)
       (xterm-register-default-colors)
     (xterm-register-default-colors xterm-standard-colors))
-  (tty-set-up-initial-frame-faces)
-  (cond
-   ((string= (getenv "MWG_LOGINTERM") "cygwin")
-    (load "term/cygwin")
-    (cygwin-register-keymap))
-   ((string= (getenv "MWG_LOGINTERM") "rosaterm")
-    (load "term/rosaterm")
-    (rosaterm-register-keymap))
-   (t
-    (load "term/rosaterm")
-    (rosaterm-register-keymap))
-   ))
+  (tty-set-up-initial-frame-faces))
 
 ;; screen.el ends here

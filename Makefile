@@ -24,6 +24,7 @@ endef
 
 dirs += $(MYDIR) $(MYDIR)/term
 $(eval $(call MyLispCompile,my/mwg.el))
+$(eval $(call MyLispCompile,my/mwg-decode-map.el))
 $(eval $(call MyLispCompile,my/mwg-c++exp.el))
 $(eval $(call MyLispCompile,my/mwg-doxygen.el))
 $(eval $(call MyLispCompile,my/mwg-js2-config.el))
