@@ -240,6 +240,24 @@
 
 ;;-----------------------------------------------------------------------------
 
+;; f13-f60 を {S-,C-,C-S-}f{1..12} に翻訳する
+(defun mwg-decode-map/define-function-key-translation(mods shift)
+  (let ((map key-translation-map)
+        (index 1))
+    (while (<= index 12)
+      (let* ((s_from (concat "f" (int-to-string (+ index shift))))
+             (s_to (concat mods "f" (int-to-string index)))
+             (v_from (vector (make-symbol s_from)))
+             (v_to (vector (make-symbol s_to))))
+        (define-key map v_from v_to))
+      (setq index (1+ index)))))
+(mwg-decode-map/define-function-key-translation "S-" 12)
+(mwg-decode-map/define-function-key-translation "C-" 24)
+(mwg-decode-map/define-function-key-translation "C-S-" 36)
+(mwg-decode-map/define-function-key-translation "M-" 48)
+(mwg-decode-map/define-function-key-translation "M-S-" 60)
+(mwg-decode-map/define-function-key-translation "C-M-S-" 72)
+
 (cond
  ((string= (getenv "MWG_LOGINTERM") "cygwin")
   (load "term/cygwin")
