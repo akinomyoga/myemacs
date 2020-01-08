@@ -264,4 +264,3 @@
   (cygwin-register-keymap))
  (t
   (mwg-decode-map/register)))
-

@@ -10,13 +10,13 @@ MYDIR:=$(EMACSD)/my
 
 define MyLispCopy
 copyfiles += $(EMACSD)/$1
-$(EMACSD)/$1: $(1:my/%=%) | $(dir $(EMACSD)/$1)
+$(EMACSD)/$1: $(1:my/%=%) | $(patsubst %/,%,$(dir $(EMACSD)/$1))
 endef
 
 define MyLispCompile
 copyfiles += $(EMACSD)/$1
 compilefiles += $(EMACSD)/$1c
-$(EMACSD)/$1: $(1:my/%=%) | $(dir $(EMACSD)/$1)
+$(EMACSD)/$1: $(1:my/%=%) | $(patsubst %/,%,$(dir $(EMACSD)/$1))
 $(EMACSD)/$1c: $(EMACSD)/$1
 endef
 
