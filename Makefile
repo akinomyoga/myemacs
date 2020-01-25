@@ -77,6 +77,7 @@ all:
 
 packages += js2-mode
 packages += auto-complete
+packages += markdown-mode
 package-install $(MYDIR)/package-install.stamp: | $(MYDIR)
 	./make_command.sh package-install $(packages)
 	touch $(MYDIR)/package-install.stamp

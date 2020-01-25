@@ -1398,7 +1398,16 @@ This function has the different behaviors with original one in the following two
        (:background "yellow1"))
       (t
        (:background "black" :foreground "green1" :weight bold))
-      ))))
+      )))
+
+  ;; markdown
+  (custom-set-faces
+   '(markdown-header-delimiter-face
+     ((t (:weight bold :inherit markdown-header-face))))
+   '(markdown-list-face
+     ((t (:weight bold :inherit font-lock-builtin-face))))
+   '(markdown-markup-face
+     ((t (:inherit default))))))
 
 (defvar mwg-option-enable-color nil)
 (defvar mwg-option-set-customcolor nil)
