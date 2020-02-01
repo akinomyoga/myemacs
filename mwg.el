@@ -1407,7 +1407,7 @@ This function has the different behaviors with original one in the following two
    '(markdown-list-face
      ((t (:weight bold :inherit font-lock-builtin-face))))
    '(markdown-markup-face
-     ((t (:inherit default))))))
+     ((t (:foreground "color-27" :inherit default))))))
 
 (defvar mwg-option-enable-color nil)
 (defvar mwg-option-set-customcolor nil)
