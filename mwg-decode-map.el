@@ -78,6 +78,10 @@
     ;; (funcall kf+CMS "koge"   "8" "~")
     ;; (funcall kf+CMS "toge"   "9" "~")
 
+    ;; xterm
+    (funcall kf+CMS "home" "1" "H")
+    (funcall kf+CMS "end"  "1" "F")
+
     ;; C-<deleteline>    C-DelLn   == A-C-delete
     ;; C-M-<deleteline>  C-M-DelLn == A-C-M-delete
 
@@ -257,6 +261,10 @@
 (mwg-decode-map/define-function-key-translation "M-" 48)
 (mwg-decode-map/define-function-key-translation "M-S-" 60)
 (mwg-decode-map/define-function-key-translation "C-M-S-" 72)
+
+;; functions defined in term/cygwin
+(eval-when-compile
+  (declare-function cygwin-register-keymap "term/cygwin"))
 
 (cond
  ((string= (getenv "MWG_LOGINTERM") "cygwin")
