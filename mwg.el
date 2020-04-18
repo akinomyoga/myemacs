@@ -149,8 +149,6 @@ This function has the different behaviors with original one in the following two
   (add-hook 'csharp-mode-hook 'mwg-tabwidth-c-mode-hook))
 
 ;;---- bashfc/sh-mode ---------------------------------------------------------
-(defun mwg-add-hook-bashfc ()
-  (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-mode) auto-mode-alist)))
 
 ;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
 (eval-when-compile
@@ -162,8 +160,15 @@ This function has the different behaviors with original one in the following two
   (sh-mode)
   (sh-set-shell "bash"))
 
-;; http://unix.stackexchange.com/questions/20121/how-to-disable-emacs-here-document-completion
-(add-hook 'sh-mode-hook '(lambda () (sh-electric-here-document-mode -1)))
+(defun mwg-add-hook-shell ()
+  ;; *.bash
+  (setq auto-mode-alist (cons '("\\.bash$" . sh-bash-mode) auto-mode-alist))
+
+  ;; bashfc
+  (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-bash-mode) auto-mode-alist))
+
+  ;; http://unix.stackexchange.com/questions/20121/how-to-disable-emacs-here-document-completion
+  (add-hook 'sh-mode-hook '(lambda () (sh-electric-here-document-mode -1))))
 
 ;;---- xml-mode ---------------------------------------------------------------
 (defvar mwg-xml-tag-region/previous-tagname "xml")
