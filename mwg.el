@@ -389,6 +389,14 @@ This function has the different behaviors with original one in the following two
 (add-hook 'perl-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
 (add-hook 'php-mode-hook 'mwg/regexp-word-boundary/.mode-hook)
 
+;;-- fill-indent --------------------------------------------------------------
+;; https://stackoverflow.com/questions/10743708
+
+(defun mwg/turn-off-fill-mode-indent ()
+  (setq fill-indent-according-to-mode nil))
+(add-hook 'latex-mode-hook  'mwg/turn-off-fill-mode-indent)
+(add-hook 'tex-mode-hook    'mwg/turn-off-fill-mode-indent)
+
 ;******************************************************************************
 ;
 ;  Defining Key Translations
