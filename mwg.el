@@ -353,14 +353,16 @@ This function has the different behaviors with original one in the following two
                           (c-set-offset 'arglist-close 0)
                           (c-set-offset 'arglist-intro '+)
                           (c-set-offset 'arglist-cont 0)
-                          (c-set-offset 'arglist-cont-nonempty '+)))
+                          (c-set-offset 'arglist-cont-nonempty '+)
+                          (c-set-offset 'brace-list-intro '+)))
 (add-hook 'c++-mode-hook '(lambda ()
                           (c-set-offset 'arglist-close 0)
                           (c-set-offset 'arglist-intro '+)
                           (c-set-offset 'arglist-cont 0)
                           (c-set-offset 'arglist-cont-nonempty '+)
                           (c-set-offset 'template-args-cont '+)
-                          (c-set-offset 'inlambda 0)))
+                          (c-set-offset 'inlambda 0)
+                          (c-set-offset 'brace-list-intro '+)))
 
 ;; http://qiita.com/marcy_o/items/a3e9f99baa07d16bef95
 ;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
