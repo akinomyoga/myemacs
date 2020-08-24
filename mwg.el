@@ -364,6 +364,9 @@ This function has the different behaviors with original one in the following two
                           (c-set-offset 'inlambda 0)
                           (c-set-offset 'brace-list-intro '+)))
 
+;; https://twitter.com/lorent_kyopro/status/1297524493976363008/photo/1
+(custom-set-variables '(c-noise-macro-names '("constexpr")))
+
 ;; http://qiita.com/marcy_o/items/a3e9f99baa07d16bef95
 ;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
 (add-hook 'before-save-hook
