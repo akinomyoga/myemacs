@@ -347,22 +347,32 @@ This function has the different behaviors with original one in the following two
     ;; pike-mode-hook
     )
 
-  (add-hook 'makefile-mode-hook '(lambda () (setq tab-width 8))))
+  (add-hook 'makefile-mode-hook
+            '(lambda ()
+               (setq tab-width 8 indent-tabs-mode t))))
 
-(add-hook 'c-mode-hook '(lambda ()
-                          (c-set-offset 'arglist-close 0)
-                          (c-set-offset 'arglist-intro '+)
-                          (c-set-offset 'arglist-cont 0)
-                          (c-set-offset 'arglist-cont-nonempty '+)
-                          (c-set-offset 'brace-list-intro '+)))
-(add-hook 'c++-mode-hook '(lambda ()
-                          (c-set-offset 'arglist-close 0)
-                          (c-set-offset 'arglist-intro '+)
-                          (c-set-offset 'arglist-cont 0)
-                          (c-set-offset 'arglist-cont-nonempty '+)
-                          (c-set-offset 'template-args-cont '+)
-                          (c-set-offset 'inlambda 0)
-                          (c-set-offset 'brace-list-intro '+)))
+(add-hook 'c-mode-hook
+          '(lambda ()
+             (c-set-offset 'arglist-close 0)
+             (c-set-offset 'arglist-intro '+)
+             (c-set-offset 'arglist-cont 0)
+             (c-set-offset 'arglist-cont-nonempty '+)
+             (c-set-offset 'brace-list-intro '+)))
+
+(add-hook 'c++-mode-hook
+          '(lambda ()
+             (c-set-offset 'arglist-close 0)
+             (c-set-offset 'arglist-intro '+)
+             (c-set-offset 'arglist-cont 0)
+             (c-set-offset 'arglist-cont-nonempty '+)
+             (c-set-offset 'template-args-cont '+)
+             (c-set-offset 'inlambda 0)
+             (c-set-offset 'brace-list-intro '+)))
+
+;; https://gist.github.com/conao3/3e6fe3fad41dc33a1e26a4a1afe96644#file-auto-save-buffer-el-L71-L76
+(add-hook 'makefile-mode-hook
+          '(lambda ()
+             (fset 'makefile-warn-suspicious-lines 'ignore)))
 
 ;; https://twitter.com/lorent_kyopro/status/1297524493976363008/photo/1
 (custom-set-variables '(c-noise-macro-names '("constexpr")))
