@@ -153,7 +153,9 @@ This function has the different behaviors with original one in the following two
 ;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
 (eval-when-compile
   (declare-function sh-mode "sh-script")
-  (declare-function sh-set-shell "sh-script"))
+  (declare-function sh-set-shell "sh-script")
+  (defvar sh-builtins)
+  (defvar sh-other-keywords))
 (defun sh-bash-mode ()
   (interactive)
   (require 'sh-script)
@@ -169,6 +171,39 @@ This function has the different behaviors with original one in the following two
 
   ;; http://unix.stackexchange.com/questions/20121/how-to-disable-emacs-here-document-completion
   (add-hook 'sh-mode-hook '(lambda () (sh-electric-here-document-mode -1))))
+
+(eval-after-load "sh-script"
+  '(progn
+     (setq sh-builtins
+           (append sh-builtins
+                   '(
+                     (gnuplot "cd" "pwd"
+                              "call" "eval"
+                              "clear"
+                              "fit"
+                              "help"
+                              "history"
+                              "import"
+                              "load" "save"
+                              "lower" "raise"
+                              "plot" "splot" "replot"
+                              "print" "printerr"
+                              "refresh"
+                              "set" "unset" "show" "reset"
+                              "shell" "system" "logout"
+                              "stats"
+                              "test"
+                              "toggle"
+                              "undefine"
+                              "update"
+                              "vclear" "vfill")))
+           sh-other-keywords
+           (append sh-other-keywords
+                   '((gnuplot "pause" "exit" "quit" "reread"
+                              "break" "continue"
+                              "do" "if" "for" "while")))
+           )))
+
 
 ;;---- xml-mode ---------------------------------------------------------------
 (defvar mwg-xml-tag-region/previous-tagname "xml")
