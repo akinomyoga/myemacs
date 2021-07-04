@@ -10,7 +10,7 @@ function command.package-install {
   # -l にプロセス置換を指定しても期待通りに動かない
   {
     echo "(require 'package)"
-    echo "(add-to-list 'package-archives '(\"melpa\" . \"http://melpa.milkbox.net/packages/\") t)"
+    echo "(add-to-list 'package-archives '(\"melpa\" . \"http://melpa.org/packages/\") t)"
     echo "(setq url-http-attempt-keepalives nil)"
     echo "(package-refresh-contents)"
     echo "(package-initialize)"
