@@ -99,13 +99,15 @@
                  (ac-disable-faces/match (cdr face)))
            (memq face ac-disable-faces))))
   (defun ac-cursor-on-diable-face-p (&optional point)
-    "This function overrides the original function `ac-cursor-on-diable-face-p' in auto-complete.el.
-This function has the different behaviors with original one in the following two points:
-- The original one looks the face after the cursor,
-  but this function looks that before the cursor
-  because the word to be completed is always located before the cursor.
-- This function provides the support for the text with multiple faces
-  which are not supported in the original function."
+    "This function overrides the original function `ac-cursor-on-diable-face-p' in
+auto-complete.el.  This function has the different behaviors with original one
+in the following two points:
+
+- The original one looks the face after the cursor, but this function looks
+  that before the cursor because the word to be completed is always located
+  before the cursor.
+- This function provides the support for the text with multiple faces which are
+  not supported in the original function."
     (let ((pt (1- (or point (point)))))
       (and (>= pt (point-min))
            (ac-disable-faces/match (get-text-property pt 'face)))))
@@ -150,17 +152,24 @@ This function has the different behaviors with original one in the following two
 
 ;;---- bashfc/sh-mode ---------------------------------------------------------
 
-;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
 (eval-when-compile
   (declare-function sh-mode "sh-script")
   (declare-function sh-set-shell "sh-script")
+  (declare-function sh-electric-here-document-mode "sh-script")
   (defvar sh-builtins)
   (defvar sh-other-keywords))
+
+;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
 (defun sh-bash-mode ()
   (interactive)
-  (require 'sh-script)
-  (sh-mode)
-  (sh-set-shell "bash"))
+  ;; Note: We check the recursive call using the variable sh-bash-mode-guard
+  ;; because somehow sh-bash-mode can be called recursively when "mode:
+  ;; sh-bash" is in emacs file local variables in Emacs 28.1.
+  (if (not (boundp 'sh-bash-mode-guard))
+      (let ((sh-bash-mode-guard t))
+        (require 'sh-script)
+        (sh-mode)
+        (sh-set-shell "bash"))))
 
 (defun mwg-add-hook-shell ()
   ;; *.bash
@@ -170,7 +179,7 @@ This function has the different behaviors with original one in the following two
   (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-bash-mode) auto-mode-alist))
 
   ;; http://unix.stackexchange.com/questions/20121/how-to-disable-emacs-here-document-completion
-  (add-hook 'sh-mode-hook '(lambda () (sh-electric-here-document-mode -1))))
+  (add-hook 'sh-mode-hook (lambda () (sh-electric-here-document-mode -1))))
 
 (eval-after-load "sh-script"
   '(progn
@@ -383,31 +392,31 @@ This function has the different behaviors with original one in the following two
     )
 
   (add-hook 'makefile-mode-hook
-            '(lambda ()
-               (setq tab-width 8 indent-tabs-mode t))))
+            (lambda ()
+              (setq tab-width 8 indent-tabs-mode t))))
 
 (add-hook 'c-mode-hook
-          '(lambda ()
-             (c-set-offset 'arglist-close 0)
-             (c-set-offset 'arglist-intro '+)
-             (c-set-offset 'arglist-cont 0)
-             (c-set-offset 'arglist-cont-nonempty '+)
-             (c-set-offset 'brace-list-intro '+)))
+          (lambda ()
+            (c-set-offset 'arglist-close 0)
+            (c-set-offset 'arglist-intro '+)
+            (c-set-offset 'arglist-cont 0)
+            (c-set-offset 'arglist-cont-nonempty '+)
+            (c-set-offset 'brace-list-intro '+)))
 
 (add-hook 'c++-mode-hook
-          '(lambda ()
-             (c-set-offset 'arglist-close 0)
-             (c-set-offset 'arglist-intro '+)
-             (c-set-offset 'arglist-cont 0)
-             (c-set-offset 'arglist-cont-nonempty '+)
-             (c-set-offset 'template-args-cont '+)
-             (c-set-offset 'inlambda 0)
-             (c-set-offset 'brace-list-intro '+)))
+          (lambda ()
+            (c-set-offset 'arglist-close 0)
+            (c-set-offset 'arglist-intro '+)
+            (c-set-offset 'arglist-cont 0)
+            (c-set-offset 'arglist-cont-nonempty '+)
+            (c-set-offset 'template-args-cont '+)
+            (c-set-offset 'inlambda 0)
+            (c-set-offset 'brace-list-intro '+)))
 
 ;; https://gist.github.com/conao3/3e6fe3fad41dc33a1e26a4a1afe96644#file-auto-save-buffer-el-L71-L76
 (add-hook 'makefile-mode-hook
-          '(lambda ()
-             (fset 'makefile-warn-suspicious-lines 'ignore)))
+          (lambda ()
+            (fset 'makefile-warn-suspicious-lines 'ignore)))
 
 ;; https://twitter.com/lorent_kyopro/status/1297524493976363008/photo/1
 (custom-set-variables '(c-noise-macro-names '("constexpr")))
@@ -415,12 +424,12 @@ This function has the different behaviors with original one in the following two
 ;; http://qiita.com/marcy_o/items/a3e9f99baa07d16bef95
 ;; http://emacs.stackexchange.com/questions/5452/before-save-hook-for-cc-mode
 (add-hook 'before-save-hook
-          '(lambda()
-             (when (and (boundp 'c-buffer-is-cc-mode)
-                        c-buffer-is-cc-mode
-                        (not (and (boundp 'mwg-no-delete-trailing-whitespaces)
-                                  mwg-no-delete-trailing-whitespaces)))
-               (delete-trailing-whitespace))))
+          (lambda()
+            (when (and (boundp 'c-buffer-is-cc-mode)
+                       c-buffer-is-cc-mode
+                       (not (and (boundp 'mwg-no-delete-trailing-whitespaces)
+                                 mwg-no-delete-trailing-whitespaces)))
+              (delete-trailing-whitespace))))
 
 
 ;;---- regexp \b --------------------------------------------------------------
@@ -559,16 +568,20 @@ This function has the different behaviors with original one in the following two
 ;;                    <f12>
 
 (global-set-key
- [f5] '(lambda ()
-         (interactive)
-         (insert (format-time-string "%Y-%m-%d %H:%M:%S"))))
+ [f5] (lambda ()
+        (interactive)
+        (insert (format-time-string "%Y-%m-%d %H:%M:%S"))))
 (global-set-key
- [C-f5] '(lambda ()
-           (interactive)
-           (insert (format-time-string "%Y-%m-%d"))))
+ [C-f5] (lambda ()
+          (interactive)
+          (insert (format-time-string "%Y-%m-%d"))))
 
 ;;-----------------------------------------------------------------------------
 ;;  switching buffers
+
+(eval-when-compile
+  ;; variables defined by iswitchb mode
+  (defvar iswitchb-mode-map))
 
 (global-set-key (kbd "<f7>") (kbd "C-x C-b RET"))
 (global-set-key (kbd "<f8>") 'switch-to-buffer)
@@ -577,10 +590,10 @@ This function has the different behaviors with original one in the following two
 
 (global-set-key "\C-x\C-b" 'switch-to-buffer)
 (add-hook 'iswitchb-define-mode-map-hook
-          '(lambda()
-             (define-key iswitchb-mode-map "\C-b" 'iswitchb-exit-minibuffer)
-             (define-key iswitchb-mode-map [right] 'iswitchb-next-match)
-             (define-key iswitchb-mode-map [left] 'iswitchb-prev-match)))
+          (lambda()
+            (define-key iswitchb-mode-map "\C-b" 'iswitchb-exit-minibuffer)
+            (define-key iswitchb-mode-map [right] 'iswitchb-next-match)
+            (define-key iswitchb-mode-map [left] 'iswitchb-prev-match)))
 
 ;; 現在の選択候補の内容を表示する設定 (from http://yosshi.typepad.jp/blog/2009/11/emacs-%E3%81%AE%E3%83%90%E3%83%83%E3%83%95%E3%82%A1%E5%88%87%E3%82%8A%E6%9B%BF%E3%81%88%E3%82%92-iswitchb-%E3%81%A7%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%9E%E3%82%A4%E3%82%BA.html)
 ;; (defadvice iswitchb-exhibit (after iswitchb-exhibit-with-display-buffer activate)
@@ -1509,3 +1522,22 @@ This function has the different behaviors with original one in the following two
        (:foreground "blue"))))
    '(default
      ((t (:foreground "unspecified-fg" :background "unspecified-bg"))))))
+
+;;-----------------------------------------------------------------------------
+
+(eval-when-compile
+  ;; variables defined in auto-complete-mode
+  (defvar package-activated-list)
+  (declare-function package-installed-p "package"))
+
+;; https://stackoverflow.com/a/40272361/4908404
+(defun mwg/package-reinstall-all ()
+  "Refresh and reinstall all activated packages."
+  (interactive)
+  (require 'package)
+  (package-refresh-contents)
+  (dolist (package-name package-activated-list)
+    (when (package-installed-p package-name)
+      (unless (ignore-errors                   ;some packages may fail to install
+                (package-reinstall package-name))
+        (warn "Package %s failed to reinstall" package-name)))))
