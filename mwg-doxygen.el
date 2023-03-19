@@ -1063,12 +1063,13 @@ POS is the beginning position of a comment."
   "
 REGEXP には適用対象を指定します。
 
-* REGEXP を eval した結果が文字列の場合はその文字列を正規表現として検索を行います。
-  検索が一致した場合に一致範囲に HIGHLIGHTER を適用します。
-* REGEXP を eval した結果が文字列ではない場合は、更にそれを関数として呼び出します。
-  関数は第一引数に LIMIT を受け取ります。関数内では正規表現による一致を試行し match-data を設定します。
-  関数は、適用対象が見付からなかった場合は nil を返し、それ以外の場合は nil 以外の値を返します。
-  関数が nil 以外を返した時に HIGHLIGHTER を適用します。
+* REGEXP を eval した結果が文字列の場合はその文字列を正規表現として検索を行いま
+  す。検索が一致した場合に一致範囲に HIGHLIGHTER を適用します。
+* REGEXP を eval した結果が文字列ではない場合は、更にそれを関数として呼び出しま
+  す。関数は第一引数に LIMIT を受け取ります。関数内では正規表現による一致を試行
+  し match-data を設定します。関数は、適用対象が見付からなかった場合は nil を返
+  し、それ以外の場合は nil 以外の値を返します。関数が nil 以外を返した時に
+  HIGHLIGHTER を適用します。
 
 例:
 
@@ -1076,10 +1077,13 @@ REGEXP には適用対象を指定します。
 
   REGEXP = (concat var1 \"\\\\|bar\")
 
-  REGEXP = '(lambda (limit) ...内部でmatch-dataを設定しnil以外を返す または nilを返す...)
+  REGEXP = '(lambda (limit) ...(内部でmatch-dataを設定しnil以外を返す)
+                               または (nilを返す)...)
 
-REGEXP が一致した時、HIGHLIGHTER が `mwg-doxygen/font-lock-apply-recursive-highlight' によって適用されます。
-HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight' の説明を参照して下さい。"
+REGEXP が一致した時、HIGHLIGHTER が
+`mwg-doxygen/font-lock-apply-recursive-highlight' によって適用されます。
+HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight'
+の説明を参照して下さい。"
   (let ((matcher (eval regexp)))
     (while (if (stringp matcher)
                (re-search-forward matcher limit t)
@@ -1093,14 +1097,18 @@ HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-high
 
 * HIGHLIGHTER := <highliter>
 
-* <highlighter> := (match-index 'font-face-to-apply font-lock-override-type ignore-nomatch)
-  If the first element is an integer, <highlighter> is treated as this quartet form.
-  Applies font face to the range with specified match index.
-  It is the argument for the `font-lock-apply-highlight'.
+* <highlighter> := (match-index 'font-face-to-apply font-lock-override-type
+  ignore-nomatch)
+
+  If the first element is an integer, <highlighter> is treated as this quartet
+  form.  Applies font face to the range with specified match index.  It is the
+  argument for the `font-lock-apply-highlight'.
 
 * <highlighter> := (progn ...)
-  If the first element is a symbol, <highlighter> is treated as a program.
-  This S-expression can return a <highlighter> object which will be recursively processed.
+
+  If the first element is a symbol, <highlighter> is treated as a program. This
+  S-expression can return a <highlighter> object which will be recursively
+  processed.
 
 * <highlighter> := (<highlighter> <highlighter> ... <highlighter>)
   Each sub highlighter is applied in order.
@@ -1127,7 +1135,8 @@ HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-high
 
 (defun mwg-doxygen/font-lock-apply-highlight (highlight)
   "a version of `font-lock-apply-highlight' with 'remove as an override spec.
-font-lock の `font-lock-apply-highlight' を拡張します。引数は以下の形式を取ります。
+font-lock の `font-lock-apply-highlight' を拡張します。引数は以下の形式を取りま
+す。
 
   HIGHLIGHT := (group face override ignore-nomatch)
 
@@ -1188,8 +1197,9 @@ font-lock の `font-lock-apply-highlight' を拡張します。引数は以下�
 
 (defun mwg-doxygen/font-lock-remove-text-property (start end prop value &optional object)
   "Remove from one property of the text from START to END.
-Arguments PROP and VALUE specify the property and value to be removed from the value
-already in place. Optional argument OBJECT is the string or buffer containing the text."
+Arguments PROP and VALUE specify the property and value to be removed from the
+value already in place. Optional argument OBJECT is the string or buffer
+containing the text."
   (let ((vlist (mwg-doxygen/ensure-listp value)) next prev)
     (while (/= start end)
       (setq next (next-single-property-change start prop object end)
@@ -1206,9 +1216,9 @@ already in place. Optional argument OBJECT is the string or buffer containing th
                          object)
       (setq start next))))
 (defun mwg-doxygen/font-lock-chkset-text-property (start end prop value &optional object)
-  "VALUE は (target-value . new-values) の形式で指定します。
-target-value が text-property として既に設定されている値に含まれている場合に、
-既存の設定を全て削除して new-values を text-property に設定します。"
+  "VALUE は (target-value . new-values) の形式で指定します。target-value が
+text-property として既に設定されている値に含まれている場合に、既存の設定を全て
+削除して new-values を text-property に設定します。"
   (let* ((vndl (car value))
          (new-values (cdr value))
          next prev)

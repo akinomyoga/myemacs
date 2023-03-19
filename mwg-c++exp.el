@@ -359,20 +359,30 @@ which corresponds to the opening bracket on the current point.
   (let ((wbeg (point)))
     (buffer-substring (- wbeg wlen ) wbeg)))
 (defun mwg-c++exp-until::backward (predicator)
-  "Move point backward to the end reported by the specified backward predicator.
-The backward predicator is specified by `PREDICATOR'.
-The `point' is set to the start point of the searching.
-  The predicator tests whether the current word is the destination point or not,
-and gives the information on the destination point through its return value:
-1) `mwg-c++exp-pred::end0' indicates the end of the current word is the destination.
-2) `mwg-c++exp-pred::endW' indicates the beginning of the current word is the destination.
-3) `mwg-c++exp-pred::end1' indicates the last character of the current word is the destination.
-4) `mwg-c++exp-pred::err' indicates that the searching for the destination is failed.
-5) `mwg-c++exp-pred::nxt' indicates that the current word is not yet the destination.
+  "Move point backward to the end reported by the specified backward
+predicator.  The backward predicator is specified by `PREDICATOR'.  The `point'
+is set to the start point of the searching.
+
+  The predicator tests whether the current word is the destination point or
+not, and gives the information on the destination point through its return
+value:
+
+1) `mwg-c++exp-pred::end0' indicates the end of the current word is the
+   destination.
+2) `mwg-c++exp-pred::endW' indicates the beginning of the current word is the
+   destination.
+3) `mwg-c++exp-pred::end1' indicates the last character of the current word is
+   the destination.
+4) `mwg-c++exp-pred::err' indicates that the searching for the destination
+   failed.
+5) `mwg-c++exp-pred::nxt' indicates that the current word is not yet the
+   destination.
 6) `mwg-c++exp-pred::def/end' is the default value for the current word.
-If the current word is a opening parenthesis, it is the same as the `mwg-c++exp-pred::end0'.
-If the current word is a closing parenthesis and the corresponding opening parenthesis is found,
-the point will be moved to the beginning of the opening parenthesis and the search will be continued.
+
+If the current word is a opening parenthesis, it is the same as the
+`mwg-c++exp-pred::end0'.  If the current word is a closing parenthesis and the
+corresponding opening parenthesis is found, the point will be moved to the
+beginning of the opening parenthesis and the search will be continued.
 Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
   (let ((ret mwg-c++exp-until::ret-fail))
     (while (= (setq ret (mwg-c++exp-until::backward-sub predicator))
@@ -694,14 +704,16 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
     (mwg-c++exp-opdict::get wlen ch)))
 
 (defun mwg-c++exp-pred::forward-opprec (wlen ch)
-  "Forward predicator to determine whether current word is the end point or not,
-using the specified operator precedence.
-  The operator precidence is specified by `mwg-c++exp-arg::prec',
-and the `WLEN' is the length of the current word,
-and the `CH' is the first character of the current word,
-and the current `point' must be placed before the current word.
-  This function returns `mwg-c++exp-pred::end0' when the current word is end point,
-otherwise it returns `mwg-c++exp-pred::def/end'."
+  "Forward predicator to determine whether current word is the end point or
+not, using the specified operator precedence.
+
+  The operator precidence is specified by `mwg-c++exp-arg::prec', and the
+`WLEN' is the length of the current word, and the `CH' is the first character
+of the current word, and the current `point' must be placed before the current
+word.
+
+  This function returns `mwg-c++exp-pred::end0' when the current word is end
+point, otherwise it returns `mwg-c++exp-pred::def/end'."
   (if (mwg-c++exp-opdict::forward-rangle?)
       mwg-c++exp-pred::end0
     (let ((prec (mwg-c++exp-opdict::forward-get wlen ch)))
@@ -710,14 +722,16 @@ otherwise it returns `mwg-c++exp-pred::def/end'."
         mwg-c++exp-pred::def/end))))
 
 (defun mwg-c++exp-pred::backward-opprec (wlen ch)
-  "Backward predicator to determine whether current word is the end point or not,
-using the specified operator precedence.
-  The operator precidence is specified by `mwg-c++exp-arg::prec',
-and the `WLEN' is the length of the current word,
-and the `CH' is the last character of the current word,
-and the current `point' must be placed after the current word.
-  This function returns `mwg-c++exp-pred::end0' when the current word is end point,
-otherwise it returns `mwg-c++exp-pred::def/end'."
+  "Backward predicator to determine whether current word is the end point or
+not, using the specified operator precedence.
+
+  The operator precidence is specified by `mwg-c++exp-arg::prec', and the
+`WLEN' is the length of the current word, and the `CH' is the last character of
+the current word, and the current `point' must be placed after the current
+word.
+
+  This function returns `mwg-c++exp-pred::end0' when the current word is end
+point, otherwise it returns `mwg-c++exp-pred::def/end'."
   (if (mwg-c++exp-opdict::backward-langle?)
       mwg-c++exp-pred::end0
     (let ((prec (mwg-c++exp-opdict::backward-get wlen ch)))
@@ -748,15 +762,16 @@ and `END2' specifies the end point of the first region."
   (if (re-search-backward "[^[:space:]\r\n]" nil 1)
       (forward-char 1)))
 (defun mwg-transpose-c++words::try-from (op1b predBwd op1e predFwd &optional isBackward)
-  "Determine two regions using specified predicators and try to replcae the content of the two regions.
-The end point of the first region is specified by `OP1B'.
-The beginning point of the first region is determined by the backward predicator, `PREDBWD'.
-The beginning point of the second region is specified by `OP1E'.
-The end point of the second region is determined using the forward predicator, `PREDFWD'.
+  "Determine two regions using specified predicators and try to replcae the
+content of the two regions. The end point of the first region is specified by
+`OP1B'.  The beginning point of the first region is determined by the backward
+predicator, `PREDBWD'.  The beginning point of the second region is specified
+by `OP1E'.  The end point of the second region is determined using the forward
+predicator, `PREDFWD'.
 
-In the end, it moves the current point to the end of the second region.
-If the argument `ISBACKWARD' is set, it moves the current point
-to the beginning of the first region instead of the end of the second region."
+In the end, it moves the current point to the end of the second region. If the
+argument `ISBACKWARD' is set, it moves the current point to the beginning of
+the first region instead of the end of the second region."
   (let* ((r1e (progn (goto-char op1b)
                      (mwg-transpose-c++words::skip-bwd-space)
                      (point)))
@@ -775,9 +790,9 @@ to the beginning of the first region instead of the end of the second region."
     t))
 
 (defun mwg-transpose-c++words::try-around-operator (op1b op1e &optional isBackward)
-  "Try to transpose c++ expressions around the specified binary operator.
-The first point of the operator is specified by `OP1B',
-and the last point of the operator is specified by `OP1E'."
+  "Try to transpose c++ expressions around the specified binary operator.  The
+first point of the operator is specified by `OP1B', and the last point of the
+operator is specified by `OP1E'."
   (let* ((op1l (- op1e op1b))
          (prec0 (progn (goto-char op1b)
                        (mwg-c++exp-opdict::forward-get op1l (char-after))))
