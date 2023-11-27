@@ -456,6 +456,16 @@ in the following two points:
 (add-hook 'latex-mode-hook  'mwg/turn-off-fill-mode-indent)
 (add-hook 'tex-mode-hook    'mwg/turn-off-fill-mode-indent)
 
+;;-- fill-column --------------------------------------------------------------
+
+(defun mwg/fill-column.hook ()
+  (setq fill-column 79))
+(add-hook 'sh-mode-hook 'mwg/fill-column.hook)
+(add-hook 'c-mode-hook 'mwg/fill-column.hook)
+(add-hook 'c++-mode-hook 'mwg/fill-column.hook)
+(add-hook 'tex-mode-hook 'mwg/fill-column.hook)
+(add-hook 'latex-mode-hook 'mwg/fill-column.hook)
+
 ;******************************************************************************
 ;
 ;  Defining Key Translations
