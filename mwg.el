@@ -173,7 +173,7 @@ in the following two points:
 
 (defun mwg-add-hook-shell ()
   ;; *.bash
-  (setq auto-mode-alist (cons '("\\.bash\\(rc\\)?$" . sh-bash-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.bash?$\\|\\.\\(bash\\|ble\\)rc$\\|\\(^\\|/\\)\\(bash\\|ble\\)rc\\(\\.\\|$\\)" . sh-bash-mode) auto-mode-alist))
 
   ;; bashfc
   (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-bash-mode) auto-mode-alist))
