@@ -157,7 +157,8 @@ in the following two points:
   (declare-function sh-set-shell "sh-script")
   (declare-function sh-electric-here-document-mode "sh-script")
   (defvar sh-builtins)
-  (defvar sh-other-keywords))
+  (defvar sh-other-keywords)
+  (defvar sh-ancestor-alist))
 
 ;; write `-*- mode: sh; mode: sh-bash -*-' in your mode line
 (defun sh-bash-mode ()
@@ -170,10 +171,24 @@ in the following two points:
         (require 'sh-script)
         (sh-mode)
         (sh-set-shell "bash"))))
+;; write `-*- mode: sh; mode: sh-blesh -*-' in your mode line
+(defun sh-blesh-mode ()
+  (interactive)
+  ;; Note: We check the recursive call using the variable sh-blesh-mode-guard
+  ;; because somehow sh-blesh-mode can be called recursively when "mode:
+  ;; sh-blesh" is in emacs file local variables in Emacs 28.1.
+  (if (not (boundp 'sh-blesh-mode-guard))
+      (let ((sh-blesh-mode-guard t))
+        (require 'sh-script)
+        (sh-mode)
+        (sh-set-shell "blesh"))))
 
 (defun mwg-add-hook-shell ()
   ;; *.bash
-  (setq auto-mode-alist (cons '("\\.bash?$\\|\\.\\(bash\\|ble\\)rc$\\|\\(^\\|/\\)\\(bash\\|ble\\)rc\\(\\.\\|$\\)" . sh-bash-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.bash?$\\|\\.bashrc$\\|\\(^\\|/\\)bashrc\\(\\.\\|$\\)" . sh-bash-mode) auto-mode-alist))
+
+  ;; *.blesh
+  (setq auto-mode-alist (cons '("\\.blesh?$\\|\\.blerc$\\|\\(^\\|/\\)blerc\\(\\.\\|$\\)" . sh-blesh-mode) auto-mode-alist))
 
   ;; bashfc
   (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-bash-mode) auto-mode-alist))
@@ -205,13 +220,19 @@ in the following two points:
                               "toggle"
                               "undefine"
                               "update"
-                              "vclear" "vfill")))
+                              "vclear" "vfill")
+                     (blesh sh-append bash "ble" "bleopt" "blehook" "ble-face"
+                            "ble-bind" "ble-sabbrev"
+                            "ble-import" "ble-autoload"
+                            "ble-attach" "ble-detach"
+                            "ble-reload" "ble-update")))
            sh-other-keywords
            (append sh-other-keywords
                    '((gnuplot "pause" "exit" "quit" "reread"
                               "break" "continue"
                               "do" "if" "for" "while")))
-           )))
+           sh-ancestor-alist
+           (cons '(blesh . bash) auto-mode-alist))))
 
 
 ;;---- xml-mode ---------------------------------------------------------------
