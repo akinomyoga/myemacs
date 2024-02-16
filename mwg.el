@@ -486,6 +486,7 @@ in the following two points:
 (add-hook 'c++-mode-hook 'mwg/fill-column.hook)
 (add-hook 'tex-mode-hook 'mwg/fill-column.hook)
 (add-hook 'latex-mode-hook 'mwg/fill-column.hook)
+(add-hook 'markdown-mode-hook 'mwg/fill-column.hook)
 
 ;******************************************************************************
 ;
