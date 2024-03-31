@@ -487,7 +487,7 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
       (mwg-backward-c++word)))
 
 (defun mwg-c++exp-pred::backward-paren (wlen ch)
-  "Backward predicator for the opening parenthesis '('."
+  "Backward predicator for the opening parenthesis \\='(\\='."
   (if (= wlen 1)
       (cond ((= ch ?\()
              mwg-c++exp-pred::endW)
@@ -497,7 +497,7 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
              mwg-c++exp-pred::def/err))
     mwg-c++exp-pred::def/err))
 (defun mwg-c++exp-pred::backward-brace (wlen ch)
-  "Backward predicator for the opening brace '{'."
+  "Backward predicator for the opening brace \\='{\\='."
   (cond ((= wlen 1)
          (cond ((= ch ?\{)
                 mwg-c++exp-pred::endW)
@@ -510,7 +510,7 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
         (t
          mwg-c++exp-pred::def/err)))
 (defun mwg-c++exp-pred::backward-brack (wlen ch)
-  "Backward predicator for the opening bracket '['."
+  "Backward predicator for the opening bracket \\='[\\='."
   (cond ((= wlen 1)
          (cond ((= ch ?\[)
                 mwg-c++exp-pred::endW)
@@ -521,7 +521,7 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
         (t
          mwg-c++exp-pred::def/err)))
 (defun mwg-c++exp-pred::backward-ternary (wlen ch)
-  "Backward predicator for the first part of a ternary operator '?'."
+  "Backward predicator for the first part of a ternary operator \\='?\\='."
   (cond ((= wlen 1)
          (cond ((or (= ch ?\?))
                 mwg-c++exp-pred::endW)
@@ -536,7 +536,7 @@ Otherwise, it is same as the `mwg-c++exp-pred::nxt'."
         (t
          mwg-c++exp-pred::def/err)))
 (defun mwg-c++exp-pred::backward-angle (wlen ch)
-  "Backward predicator for the opening-angle bracket '<'."
+  "Backward predicator for the opening-angle bracket \\='<\\='."
   (cond ((= wlen 1)
          (cond ((= ch ?\<)
                 mwg-c++exp-pred::endW)

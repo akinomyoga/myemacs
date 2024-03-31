@@ -1077,12 +1077,12 @@ REGEXP には適用対象を指定します。
 
   REGEXP = (concat var1 \"\\\\|bar\")
 
-  REGEXP = '(lambda (limit) ...(内部でmatch-dataを設定しnil以外を返す)
+  REGEXP = \\='(lambda (limit) ...(内部でmatch-dataを設定しnil以外を返す)
                                または (nilを返す)...)
 
 REGEXP が一致した時、HIGHLIGHTER が
-`mwg-doxygen/font-lock-apply-recursive-highlight' によって適用されます。
-HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight'
+`mwg-doxygen/font-lock-apply-recursive-highlight\\=' によって適用されます。
+HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-highlight\\='
 の説明を参照して下さい。"
   (let ((matcher (eval regexp)))
     (while (if (stringp matcher)
@@ -1097,12 +1097,12 @@ HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-high
 
 * HIGHLIGHTER := <highliter>
 
-* <highlighter> := (match-index 'font-face-to-apply font-lock-override-type
+* <highlighter> := (match-index \\='font-face-to-apply font-lock-override-type
   ignore-nomatch)
 
   If the first element is an integer, <highlighter> is treated as this quartet
   form.  Applies font face to the range with specified match index.  It is the
-  argument for the `font-lock-apply-highlight'.
+  argument for the `font-lock-apply-highlight\\='.
 
 * <highlighter> := (progn ...)
 
@@ -1134,8 +1134,8 @@ HIGHLIGHTER の形式については `mwg-doxygen/font-lock-apply-recursive-high
         (error "invalid format of highlighter: %S" highlighter))))
 
 (defun mwg-doxygen/font-lock-apply-highlight (highlight)
-  "a version of `font-lock-apply-highlight' with 'remove as an override spec.
-font-lock の `font-lock-apply-highlight' を拡張します。引数は以下の形式を取りま
+  "a version of `font-lock-apply-highlight\\=' with \\='remove as an override spec.
+font-lock の `font-lock-apply-highlight\\=' を拡張します。引数は以下の形式を取りま
 す。
 
   HIGHLIGHT := (group face override ignore-nomatch)
@@ -1148,14 +1148,14 @@ font-lock の `font-lock-apply-highlight' を拡張します。引数は以下�
 - override = (nth 2 highlight)
   face を処理する方法を指定します。
 
-  'prepend ... 指定した face を追加します。
-  'remove  ... 指定した face を削除します。
+  \\='prepend ... 指定した face を追加します。
+  \\='remove  ... 指定した face を削除します。
      face := 適用する font-face を指定します。
 
-  'chkset  ... 指定した face1 が存在する時に face2 を設定します。
+  \\='chkset  ... 指定した face1 が存在する時に face2 を設定します。
      face := (face1 . face2) の形式を取ります。
 
-  'keylist ... 指定した keylist を範囲に再適用します。
+  \\='keylist ... 指定した keylist を範囲に再適用します。
      face := keylist の形式を取ります。
 
 - ignore-match = (nth 3 highlight)
