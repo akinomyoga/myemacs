@@ -174,21 +174,28 @@ in the following two points:
 ;; write `-*- mode: sh; mode: sh-blesh -*-' in your mode line
 (defun sh-blesh-mode ()
   (interactive)
-  ;; Note: We check the recursive call using the variable sh-blesh-mode-guard
-  ;; because somehow sh-blesh-mode can be called recursively when "mode:
-  ;; sh-blesh" is in emacs file local variables in Emacs 28.1.
   (if (not (boundp 'sh-blesh-mode-guard))
       (let ((sh-blesh-mode-guard t))
         (require 'sh-script)
         (sh-mode)
         (sh-set-shell "blesh"))))
+(defun sh-bats-mode ()
+  (interactive)
+  (if (not (boundp 'sh-bats-mode-guard))
+      (let ((sh-bats-mode-guard t))
+        (require 'sh-script)
+        (sh-mode)
+        (sh-set-shell "bats"))))
 
 (defun mwg-add-hook-shell ()
   ;; *.bash
-  (setq auto-mode-alist (cons '("\\.bash?$\\|\\.bashrc$\\|\\(^\\|/\\)bashrc\\(\\.\\|$\\)" . sh-bash-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.bash$\\|\\.bashrc$\\|\\(^\\|/\\)bashrc\\(\\.\\|$\\)" . sh-bash-mode) auto-mode-alist))
 
   ;; *.blesh
-  (setq auto-mode-alist (cons '("\\.blesh?$\\|\\.blerc$\\|\\(^\\|/\\)blerc\\(\\.\\|$\\)" . sh-blesh-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.blesh$\\|\\.blerc$\\|\\(^\\|/\\)blerc\\(\\.\\|$\\)" . sh-blesh-mode) auto-mode-alist))
+
+  ;; *.bats
+  (setq auto-mode-alist (cons '("\\.bats$" . sh-bats-mode) auto-mode-alist))
 
   ;; bashfc
   (setq auto-mode-alist (cons '("\\(^\\|[\\/]\\)bash-fc-[0-9]+$" . sh-bash-mode) auto-mode-alist))
@@ -198,6 +205,7 @@ in the following two points:
 
 (eval-after-load "sh-script"
   '(progn
+     (nconc (assq 'bash sh-builtins) '("true" "false" "compopt"))
      (setq sh-builtins
            (append sh-builtins
                    '(
@@ -225,12 +233,15 @@ in the following two points:
                             "ble-bind" "ble-sabbrev"
                             "ble-import" "ble-autoload"
                             "ble-attach" "ble-detach"
-                            "ble-reload" "ble-update")))
+                            "ble-reload" "ble-update")
+                     (bats sh-append bash "run" "skip")))
            sh-other-keywords
            (append sh-other-keywords
                    '((gnuplot "pause" "exit" "quit" "reread"
                               "break" "continue"
-                              "do" "if" "for" "while")))
+                              "do" "if" "for" "while")
+                     (blesh sh-append bash)
+                     (bats sh-append bash "@test")))
            sh-ancestor-alist
            (cons '(blesh . bash) auto-mode-alist))))
 
