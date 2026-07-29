@@ -52,6 +52,7 @@
   (defvar ac-disable-faces)
   (defvar ac-modes)
   (defvar ac-whole-common-part)
+  (defvar ac-sources)
   (declare-function ac-config-default "auto-complete")
   (declare-function ac-update-greedy "auto-complete")
   (declare-function ac-inline-live-p "auto-complete")
@@ -111,6 +112,17 @@ in the following two points:
     (let ((pt (1- (or point (point)))))
       (and (>= pt (point-min))
            (ac-disable-faces/match (get-text-property pt 'face)))))
+
+  ;; Workaround for Emacs >= 30: I have waited for a long time, but the
+  ;; upstream doesn't seem to fix the issue. According to [1], the issue is
+  ;; caused by the "ac-source-abbrev" source, so we can simply remove the
+  ;; source for now.
+  ;; [1] https://github.com/auto-complete/auto-complete/issues/533#issuecomment-2698199280
+  (when (and (boundp 'emacs-major-version)
+             (>= emacs-major-version 30))
+    (add-hook 'auto-complete-mode-hook
+              (lambda ()
+                (setq ac-sources (remove 'ac-source-abbrev ac-sources)))))
 
   ;;---- keymap -------------------------------------------
   (define-key ac-completing-map [down]   'mwg-next-line-nomark)
