@@ -1,4 +1,5 @@
-;;; mwg-decode-map.el --- extended key sequences (modifyOtherKeys, etc)
+;;; mwg-decode-map.el  -*- lexical-binding: nil; -*-
+;; Description: Extended key sequences (modifyOtherKeys, etc)
 ;; Copyright (C) 2011-2019 K. Murase.
 
 (provide 'mwg-decode-map)

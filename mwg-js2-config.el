@@ -1,3 +1,4 @@
+;; -*- lexical-binding: nil; -*-
 (provide 'mwg-js2-config)
 (require 'mwg-js2-config)
 (require 'js2-mode)

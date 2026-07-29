@@ -1,5 +1,4 @@
-;; .emacs settings -*- coding:utf-8 -*-
-
+;; .emacs settings  -*- coding:utf-8; lexical-binding: nil; -*-
 
 ;;*****************************************************************************
 ;;

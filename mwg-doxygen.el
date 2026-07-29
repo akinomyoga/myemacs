@@ -1,4 +1,4 @@
-;;; mwg-doxygen.el --- Doxygen Syntax Highlighting for GNU Emacs
+;;; mwg-doxygen.el  -*- lexical-binding: nil; -*- 
 ;; Filename: mwg-doxygen.el
 ;; Description: Doxygen Syntax Highlighting
 ;;

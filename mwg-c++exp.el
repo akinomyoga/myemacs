@@ -1,4 +1,4 @@
-;;; mwg-c++exp.el --- C++ Expression Manipulation for GNU Emacs
+;;; mwg-c++exp.el  -*- lexical-binding: nil; -*-
 ;; Filename: mwg-c++exp.el
 ;; Description: C++ Expression Manipulation
 ;; 

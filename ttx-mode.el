@@ -1,4 +1,4 @@
-;; -*- coding:utf-8 -*-
+;; -*- coding:utf-8; lexical-binding: nil; -*-
 ;; ttx-mode (TTX Mode for GNU Emacs)
 ;;
 ;; Filename: ttx-mode.el
