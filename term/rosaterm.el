@@ -1,4 +1,5 @@
-;;; rosaterm.el --- terminal support code for rosaterm
+;; -*- lexical-binding: nil; -*-
+;; rosaterm.el --- terminal support code for rosaterm
 ;; Copyright (C) 2011-2019 K. Murase.
 
 (load "term/xterm")

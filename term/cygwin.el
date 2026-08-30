@@ -1,4 +1,5 @@
-;;; cygwin.el --- support for the Cygwin terminal
+;; -*- lexical-binding: nil; -*-
+;; cygwin.el --- support for the Cygwin terminal
 ;; Copyright (C) 2011-2012 K. Murase.
 
 (defvar cygwin-function-map

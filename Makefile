@@ -32,8 +32,8 @@ $(eval $(call MyLispCompile,my/ttx-mode.el))
 $(eval $(call MyLispCompile,my/css-mode.el))
 $(eval $(call MyLispCompile,my/term/cygwin.el))
 $(eval $(call MyLispCompile,my/term/rosaterm.el))
-$(eval $(call MyLispCopy,my/term/screen.el))
-$(eval $(call MyLispCopy,my/term/screen.xterm.el))
+$(eval $(call MyLispCompile,my/term/screen.el))
+$(eval $(call MyLispCompile,my/term/screen.xterm.el))
 
 #dirs += $(EMACSD)/lisp $(EMACSD)/lisp/auto-install
 #$(eval $(call MyLispCompile,lisp/csharp-mode.el))

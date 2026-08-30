@@ -1,9 +1,15 @@
-;;; screen.xterm.el --- terminal support code for screen.xterm-256color -*- no-byte-compile: t -*-
+;; -*- lexical-binding: nil; -*-
+;; screen.xterm.el --- terminal support code for screen.xterm-256color
 ;; Treat a screen terminal similar to an xterm.
 
 ;; Copyright (C) 2011-2019 K. Murase.
 
 (load "term/xterm")
+
+(eval-when-compile
+  ;; variables and functions defined in "term/xterm.el"
+  (defvar xterm-standard-colors)
+  (declare-function xterm-register-default-colors "term/xterm"))
 
 ;;; This is for GNU Emacs 21
 (if (= 21 emacs-major-version)

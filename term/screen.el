@@ -1,4 +1,5 @@
-;;; screen.el --- terminal support code for screen-256color -*- no-byte-compile: t -*-
+;; -*- lexical-binding: nil; -*-
+;; screen.el --- terminal support code for screen-256color
 ;; Treat a screen terminal similar to an xterm.
 
 ;; Copyright (C) 2011-2016 K. Murase.
